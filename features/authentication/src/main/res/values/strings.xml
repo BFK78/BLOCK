@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  Login Screen  -->
+    <string name="features_authentication_login_title">Log in</string>
+    <string name="features_authentication_forgot_password">Forgot your password?</string>
+    <string name="features_authentication_or">or</string>
+    <!--  End Login Screen  -->
+
+    <!--  Registration Screen  -->
+    <string name="features_authentication_registration_title">Create your account</string>
+    <!--  End Registration Screen  -->
+
+</resources>
