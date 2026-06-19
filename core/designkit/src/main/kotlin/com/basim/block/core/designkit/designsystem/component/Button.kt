@@ -6,17 +6,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
@@ -26,6 +30,7 @@ fun BlockButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(5.dp),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -33,7 +38,7 @@ fun BlockButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        shape = RoundedCornerShape(5.dp),
+        shape = shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.onBackground
         ),
@@ -124,6 +129,31 @@ fun BlockOutlinedButton(
     }
 }
 
+/**
+ * Tertiary "ghost" pill button for quiet actions (Skip, dismiss). No background, 48dp touch target,
+ * `onSurface` label. Mirrors the Figma `Button/Tertiary` component (node 27:11).
+ */
+@Composable
+fun BlockTextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp),
+    content: @Composable RowScope.() -> Unit,
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = 48.dp),
+        enabled = enabled,
+        shape = CircleShape,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        contentPadding = contentPadding,
+        content = content,
+    )
+}
+
 @Composable
 private fun BlockButtonContent(
     text: @Composable () -> Unit,
@@ -169,6 +199,16 @@ fun BlockOutlinedButtonPreview() {
     BlockTheme {
         BlockBackground(modifier = Modifier.size(150.dp, 50.dp)) {
             BlockOutlinedButton(onClick = {}, content = { Text("Test button") })
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun BlockTextButtonPreview() {
+    BlockTheme {
+        BlockBackground(modifier = Modifier.size(120.dp, 50.dp)) {
+            BlockTextButton(onClick = {}, content = { Text("Skip") })
         }
     }
 }

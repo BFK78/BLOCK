@@ -10,4 +10,25 @@
     <string name="features_authentication_registration_title">Create your account</string>
     <!--  End Registration Screen  -->
 
+    <!--  Onboarding (shared)  -->
+    <string name="features_authentication_onboarding_skip">Skip</string>
+    <string name="features_authentication_onboarding_cta_next">Next</string>
+    <string name="features_authentication_onboarding_cta_get_started">Get started</string>
+
+    <!--  Onboarding — Page 1: Track  -->
+    <string name="features_authentication_onboarding_track_title">Track money clearly.</string>
+    <string name="features_authentication_onboarding_track_body">See everything in one calm place.</string>
+
+    <!--  Onboarding — Page 2: Forecast  -->
+    <string name="features_authentication_onboarding_forecast_title">Forecast with AI.</string>
+    <string name="features_authentication_onboarding_forecast_body">Know if you can afford it — before you buy.</string>
+    <string name="features_authentication_onboarding_save_goal_name">PS5 · Nov</string>
+    <string name="features_authentication_onboarding_save_goal_amount">$499</string>
+
+    <!--  Onboarding — Page 3: Save  -->
+    <string name="features_authentication_onboarding_save_title">Save block by block.</string>
+    <string name="features_authentication_onboarding_save_body">Want a PS5? BLOCK plans a safe, realistic way to get there.</string>
+    <string name="features_authentication_onboarding_sparkle_content_desc">Sparkle icon\n</string>
+    <!--  End Onboarding  -->
+
 </resources>

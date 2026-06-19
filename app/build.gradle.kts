@@ -57,6 +57,7 @@ kotlin {
 dependencies {
 
     implementation(project(":core:designkit"))
+    implementation(project(":features:authentication"))
     implementation(libs.androidx.core.splashscreen)
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
