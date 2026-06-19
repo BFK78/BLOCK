@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--  Login Screen  -->
-    <string name="features_authentication_login_title">Log in</string>
-    <string name="features_authentication_forgot_password">Forgot your password?</string>
+    <!--  Shared (auth)  -->
     <string name="features_authentication_or">or</string>
+    <string name="features_authentication_continue_google">Continue with Google</string>
+    <string name="features_authentication_continue_apple">Continue with Apple</string>
+    <string name="features_authentication_password_helper">At least 8 characters, one letter, one number or symbol.</string>
+
+    <!--  Login Screen  -->
+    <string name="features_authentication_login_eyebrow">WELCOME BACK</string>
+    <string name="features_authentication_login_title">Welcome back</string>
+    <string name="features_authentication_login_subcopy">Sign in to keep stacking toward your goals.</string>
+    <string name="features_authentication_login_email_label">Email</string>
+    <string name="features_authentication_login_email_placeholder">you@example.com</string>
+    <string name="features_authentication_login_password_label">Password</string>
+    <string name="features_authentication_forgot_password">Forgot password?</string>
+    <string name="features_authentication_login_cta">Sign in</string>
+    <string name="features_authentication_login_footer_prompt">New here?</string>
+    <string name="features_authentication_login_footer_link">Create an account</string>
     <!--  End Login Screen  -->
 
-    <!--  Registration Screen  -->
-    <string name="features_authentication_registration_title">Create your account</string>
-    <!--  End Registration Screen  -->
+    <!--  Sign Up Screen  -->
+    <string name="features_authentication_signup_eyebrow">GET STARTED</string>
+    <string name="features_authentication_signup_title">Create account</string>
+    <string name="features_authentication_signup_subcopy">Start stacking toward your first goal in minutes.</string>
+    <string name="features_authentication_signup_email_label">Email</string>
+    <string name="features_authentication_signup_email_placeholder">you@example.com</string>
+    <string name="features_authentication_signup_password_label">Password</string>
+    <string name="features_authentication_signup_promo">Add a promo code</string>
+    <string name="features_authentication_signup_terms">By continuing you agree to the Terms and Privacy Policy.</string>
+    <string name="features_authentication_signup_cta">Continue</string>
+    <string name="features_authentication_signup_footer_prompt">Already have an account?</string>
+    <string name="features_authentication_signup_footer_link">Sign in</string>
+    <!--  End Sign Up Screen  -->
 
     <!--  Auth Landing Screen  -->
     <string name="features_authentication_landing_welcome">Calm confidence\nabout money.</string>

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
-import com.basim.block.features.authentication.onboarding.OnboardingScreen
+import com.basim.block.features.authentication.landing.AuthLandingScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BlockTheme {
-                OnboardingScreen { }
+                AuthLandingScreen { }
             }
         }
     }

@@ -10,7 +10,15 @@ import com.basim.block.core.designsystem.R
 object BlockIcons {
 
     val GoogleIcon: ImageVector
-        @Composable get() = ImageVector.vectorResource(id = R.drawable.ic_google)
+        @Composable get() = ImageVector.vectorResource(id = R.drawable.core_designkit_ic_google)
+    val AppleIcon: ImageVector
+        @Composable get() = ImageVector.vectorResource(id = R.drawable.core_designkit_ic_apple)
+    val Eye: ImageVector
+        @Composable get() = ImageVector.vectorResource(id = R.drawable.core_designkit_ic_eye)
+    val EyeOff: ImageVector
+        @Composable get() = ImageVector.vectorResource(id = R.drawable.core_designkit_ic_eye_off)
+    val Plus: ImageVector
+        @Composable get() = ImageVector.vectorResource(id = R.drawable.core_designkit_ic_plus)
     val ArrowBack = Icons.AutoMirrored.Rounded.ArrowBack
 
 }
