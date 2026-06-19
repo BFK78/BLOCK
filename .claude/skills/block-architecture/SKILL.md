@@ -79,7 +79,7 @@ features/<name>/
     │   │   └── usecase/               # one class per use-case
     │   └── presentation/
     │       ├── <screenA>/             # one package per screen
-    │       │   ├── <ScreenA>Contract.kt   # UiState + UiEvent + UiEffect
+    │       │   ├── <ScreenA>Contract.kt   # UiState + UiAction + UiEvent
     │       │   ├── <ScreenA>Reducer.kt     # PURE KOTLIN
     │       │   ├── <ScreenA>ViewModel.kt   # @HiltViewModel
     │       │   └── <ScreenA>Screen.kt      # @Composable
@@ -110,37 +110,41 @@ auto-prefixed `features_<name>_` (e.g. string ids start with `features_authentic
   testable with plain JUnit and keeps the feature's core stable.
 - **data** — implements the domain repository interfaces. Room DAOs/entities (returning `Flow`),
   mappers to domain models, and a Hilt `@Module` that binds impls and provides DAOs.
-- **presentation** — MVI screens. UI renders state and emits events; it holds no business logic.
+- **presentation** — MVI screens. UI renders state and emits actions; it holds no business logic.
 
 ## The MVI loop
 
+Directional naming: an **Action** is something the *user* does (screen → ViewModel); an **Event** is
+a one-shot notification the *ViewModel* sends back (ViewModel → screen).
+
 ```
-Screen --(UiEvent)--> ViewModel --(call)--> UseCase --> Repository
+Screen --(UiAction)--> ViewModel --(call)--> UseCase --> Repository
    ^                      |
    |                      | result/partial change
    |                      v
    |                   Reducer (pure) --> new UiState
    |                      |
    +--(UiState via StateFlow)----+
-   +--(UiEffect via Channel: one-shot nav/snackbar)--+
+   +--(UiEvent via Channel: one-shot nav/snackbar)--+
 ```
 
 - **UiState** — one immutable `data class`, exposed as `StateFlow<UiState>`.
-- **UiEvent** — `sealed interface` of everything the user can do on the screen.
-- **UiEffect** — `sealed interface` of one-shot side effects (navigate, show snackbar). Delivered
-  through a **`Channel` + `receiveAsFlow()`**, *not* a `StateFlow`/`SharedFlow`, so each effect
-  fires
-  exactly once and isn't replayed on recomposition or config change.
+- **UiAction** — `sealed interface` of everything the user can do on the screen (screen →
+  ViewModel).
+- **UiEvent** — `sealed interface` of one-shot notifications the ViewModel sends to the screen
+  (navigate, show snackbar; ViewModel → screen). Delivered through a **`Channel` +
+  `receiveAsFlow()`**, *not* a `StateFlow`/`SharedFlow`, so each event fires exactly once and isn't
+  replayed on recomposition or config change.
 - **Reducer** — a pure function `(state, change) -> state`. No coroutines, no Android. It's the one
   place new state is computed, which is why it stays pure and unit-testable.
-- **ViewModel** — `@HiltViewModel`, owns the `MutableStateFlow` and the effect `Channel`, runs
+- **ViewModel** — `@HiltViewModel`, owns the `MutableStateFlow` and the event `Channel`, runs
   use-cases in `viewModelScope`, and routes results through the reducer.
 
 ## Threading & reactivity
 
 Kotlin coroutines + Flow throughout. Room DAOs and repositories expose `Flow` for streams; use-cases
 `suspend` or return `Flow`; ViewModels collect in `viewModelScope` and publish `StateFlow`. Use a
-`Channel` only for one-shot effects.
+`Channel` only for one-shot events.
 
 ## Where to go next
 

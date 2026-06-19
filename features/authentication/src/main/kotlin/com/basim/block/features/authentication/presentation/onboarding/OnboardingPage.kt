@@ -1,4 +1,4 @@
-package com.basim.block.features.authentication.onboarding
+package com.basim.block.features.authentication.presentation.onboarding
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement

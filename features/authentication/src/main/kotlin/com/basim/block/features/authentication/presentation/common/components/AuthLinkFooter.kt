@@ -1,4 +1,4 @@
-package com.basim.block.features.authentication.common.components
+package com.basim.block.features.authentication.presentation.common.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

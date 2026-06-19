@@ -1,4 +1,4 @@
-package com.basim.block.features.authentication.onboarding
+package com.basim.block.features.authentication.presentation.onboarding
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

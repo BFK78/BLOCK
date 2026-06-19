@@ -7,9 +7,12 @@ already injected by `block.android.feature`, and a `Channel` for one-shot effect
 
 The running example is `presentation/login/` in `:features:authentication`.
 
+> Directional naming: an **Action** is something the *user* does (screen → ViewModel); an **Event**
+> is a one-shot notification the *ViewModel* sends back to the screen (ViewModel → screen).
+
 ## Table of contents
 
-1. [Contract — State, Event, Effect](#1-contract)
+1. [Contract — State, Action, Event](#1-contract)
 2. [Reducer — pure Kotlin](#2-reducer)
 3. [ViewModel — @HiltViewModel](#3-viewmodel)
 4. [Screen — Composable](#4-screen)
@@ -37,19 +40,20 @@ data class LoginUiState(
     val user: User? = null,
 )
 
-/** Everything the user can do on the screen. */
-sealed interface LoginUiEvent {
-    data class EmailChanged(val value: String) : LoginUiEvent
-    data class PasswordChanged(val value: String) : LoginUiEvent
-    data object SubmitClicked : LoginUiEvent
-    data object RegisterClicked : LoginUiEvent
+/** Everything the user can do on the screen (screen → ViewModel). */
+sealed interface LoginUiAction {
+    data class EmailChanged(val value: String) : LoginUiAction
+    data class PasswordChanged(val value: String) : LoginUiAction
+    data object SubmitClicked : LoginUiAction
+    data object RegisterClicked : LoginUiAction
 }
 
-/** One-shot side effects. Delivered via Channel — fired once, never replayed. */
-sealed interface LoginUiEffect {
-    data object NavigateToHome : LoginUiEffect
-    data object NavigateToRegister : LoginUiEffect
-    data class ShowError(val message: String) : LoginUiEffect
+/** One-shot notifications the ViewModel sends to the screen (ViewModel → screen).
+ *  Delivered via Channel — fired once, never replayed. */
+sealed interface LoginUiEvent {
+    data object NavigateToHome : LoginUiEvent
+    data object NavigateToRegister : LoginUiEvent
+    data class ShowError(val message: String) : LoginUiEvent
 }
 ```
 
@@ -66,7 +70,7 @@ new
 state, so it's trivially unit-testable and free of timing concerns.
 
 Model the partial changes as their own sealed type — these are *results* of work (validation,
-use-case outcomes), distinct from raw `UiEvent`s. The ViewModel decides which change to apply; the
+use-case outcomes), distinct from raw `UiAction`s. The ViewModel decides which change to apply; the
 reducer just applies it.
 
 ```kotlin
@@ -104,7 +108,7 @@ object LoginReducer {
 ```
 
 > Side effects (navigation, snackbars) are **not** reducer output — the reducer only computes state.
-> The ViewModel emits effects on the `Channel` separately. That separation is what keeps the reducer
+> The ViewModel emits events on the `Channel` separately. That separation is what keeps the reducer
 > pure.
 
 ---
@@ -112,7 +116,7 @@ object LoginReducer {
 ## 3. ViewModel
 
 `LoginViewModel.kt` — `@HiltViewModel`, constructor-injected use-cases. Owns the `MutableStateFlow`
-for state and a `Channel` for effects. Translates each `UiEvent` into work + reducer changes,
+for state and a `Channel` for events. Translates each `UiAction` into work + reducer changes,
 running
 suspending work in `viewModelScope`.
 
@@ -140,16 +144,16 @@ class LoginViewModel @Inject constructor(
     private val _state = MutableStateFlow(LoginUiState())
     val state: StateFlow<LoginUiState> = _state.asStateFlow()
 
-    // BUFFERED so an effect emitted before the screen collects isn't dropped.
-    private val _effects = Channel<LoginUiEffect>(Channel.BUFFERED)
-    val effects = _effects.receiveAsFlow()
+    // BUFFERED so an event emitted before the screen collects isn't dropped.
+    private val _events = Channel<LoginUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
-    fun onEvent(event: LoginUiEvent) {
-        when (event) {
-            is LoginUiEvent.EmailChanged -> apply(LoginChange.EmailUpdated(event.value))
-            is LoginUiEvent.PasswordChanged -> apply(LoginChange.PasswordUpdated(event.value))
-            LoginUiEvent.SubmitClicked -> submit()
-            LoginUiEvent.RegisterClicked -> emit(LoginUiEffect.NavigateToRegister)
+    fun onAction(action: LoginUiAction) {
+        when (action) {
+            is LoginUiAction.EmailChanged -> apply(LoginChange.EmailUpdated(action.value))
+            is LoginUiAction.PasswordChanged -> apply(LoginChange.PasswordUpdated(action.value))
+            LoginUiAction.SubmitClicked -> submit()
+            LoginUiAction.RegisterClicked -> emit(LoginUiEvent.NavigateToRegister)
         }
     }
 
@@ -160,12 +164,12 @@ class LoginViewModel @Inject constructor(
             login(current.email, current.password)
                 .onSuccess { user ->
                     apply(LoginChange.LoginSucceeded(user))
-                    emit(LoginUiEffect.NavigateToHome)
+                    emit(LoginUiEvent.NavigateToHome)
                 }
                 .onFailure { error ->
                     val message = error.message ?: "Login failed"
                     apply(LoginChange.LoginFailed(message))
-                    emit(LoginUiEffect.ShowError(message))
+                    emit(LoginUiEvent.ShowError(message))
                 }
         }
     }
@@ -174,8 +178,8 @@ class LoginViewModel @Inject constructor(
     private fun apply(change: LoginChange) =
         _state.update { LoginReducer.reduce(it, change) }
 
-    private fun emit(effect: LoginUiEffect) {
-        viewModelScope.launch { _effects.send(effect) }
+    private fun emit(event: LoginUiEvent) {
+        viewModelScope.launch { _events.send(event) }
     }
 }
 ```
@@ -184,7 +188,7 @@ Conventions:
 
 - State is read and written **only** through `_state` + the reducer (`apply`). Never mutate fields
   directly.
-- Effects always go through `emit` → the `Channel`.
+- Events always go through `emit` → the `Channel`.
 - Suspending work runs in `viewModelScope`; the scope is cancelled automatically when the ViewModel
   clears.
 
@@ -192,8 +196,8 @@ Conventions:
 
 ## 4. Screen
 
-`LoginScreen.kt` — stateless composable that observes state lifecycle-aware, collects effects once,
-and reports user actions back via `onEvent`. The ViewModel is obtained with `hiltViewModel()`.
+`LoginScreen.kt` — stateless composable that observes state lifecycle-aware, collects events once,
+and reports user actions back via `onAction`. The ViewModel is obtained with `hiltViewModel()`.
 
 ```kotlin
 package com.basim.block.features.authentication.presentation.login
@@ -213,26 +217,27 @@ fun LoginRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Collect one-shot effects exactly once for this composition.
+    // Collect one-shot events exactly once for this composition.
     LaunchedEffect(Unit) {
-        viewModel.effects.collectLatest { effect ->
-            when (effect) {
-                LoginUiEffect.NavigateToHome -> onNavigateHome()
-                LoginUiEffect.NavigateToRegister -> onNavigateRegister()
-                is LoginUiEffect.ShowError -> { /* show snackbar with effect.message */ }
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                LoginUiEvent.NavigateToHome -> onNavigateHome()
+                LoginUiEvent.NavigateToRegister -> onNavigateRegister()
+                is LoginUiEvent.ShowError -> { /* show snackbar with event.message */
+                }
             }
         }
     }
 
-    LoginScreen(state = state, onEvent = viewModel::onEvent)
+    LoginScreen(state = state, onAction = viewModel::onAction)
 }
 
 @Composable
 private fun LoginScreen(
     state: LoginUiState,
-    onEvent: (LoginUiEvent) -> Unit,
+    onAction: (LoginUiAction) -> Unit,
 ) {
-    // Render state; call onEvent(...) on user actions. Pure UI, no logic.
+    // Render state; call onAction(...) on user actions. Pure UI, no logic.
 }
 ```
 
@@ -245,18 +250,18 @@ the feature module's classpath.
 
 ## 5. Why Channel and not SharedFlow
 
-Effects are **one-shot, must-deliver-once** events: navigate, show a snackbar. Requirements:
+Events are **one-shot, must-deliver-once** notifications: navigate, show a snackbar. Requirements:
 
 - **No replay.** A new collector (after a config change/recomposition) must not re-receive an old
   navigation event. A `Channel` doesn't replay; a `StateFlow`/`replay>0 SharedFlow` would re-fire
   and
   cause double navigation.
-- **Buffered, not dropped.** `Channel(Channel.BUFFERED)` holds an effect emitted before the screen
+- **Buffered, not dropped.** `Channel(Channel.BUFFERED)` holds an event emitted before the screen
   starts collecting, so nothing is lost during the gap.
-- **Exactly-once consumption.** Each effect is received by a single collector and then gone.
+- **Exactly-once consumption.** Each event is received by a single collector and then gone.
 
 State is the opposite — it must be retained and replayed to whoever observes — so state uses
-`StateFlow` and effects use `Channel`. This is a deliberate project rule, not a stylistic choice.
+`StateFlow` and events use `Channel`. This is a deliberate project rule, not a stylistic choice.
 
 ---
 

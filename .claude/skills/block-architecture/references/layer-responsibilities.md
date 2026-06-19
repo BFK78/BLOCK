@@ -174,7 +174,7 @@ See [Hilt wiring](#hilt-wiring).
 
 ## presentation
 
-Per-screen MVI. The UI's only jobs are: render `UiState`, emit `UiEvent`, and consume `UiEffect`. No
+Per-screen MVI. The UI's only jobs are: render `UiState`, emit `UiAction`, and consume `UiEvent`. No
 business logic, no repository/DAO access, no mapping. Full code in `mvi-contract.md`. Each screen
 gets
 its own package (`presentation/login/`, `presentation/registration/`, …); composables shared

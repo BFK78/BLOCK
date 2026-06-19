@@ -1,4 +1,4 @@
-package com.basim.block.features.authentication.landing
+package com.basim.block.features.authentication.presentation.landing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

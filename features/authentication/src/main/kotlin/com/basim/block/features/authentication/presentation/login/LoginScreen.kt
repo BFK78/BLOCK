@@ -1,4 +1,4 @@
-package com.basim.block.features.authentication.login
+package com.basim.block.features.authentication.presentation.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockInputField
@@ -33,11 +36,52 @@ import com.basim.block.core.designkit.designsystem.component.BlockTopAppBar
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
-import com.basim.block.features.authentication.common.components.AuthLinkFooter
-import com.basim.block.features.authentication.common.components.AuthSocialSection
+import com.basim.block.features.authentication.presentation.common.components.AuthLinkFooter
+import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
 
 // Figma column gap is 14px between items — no spacing token covers 14, so this is an intentional literal.
 private val LOGIN_ITEM_GAP = 14.dp
+
+/**
+ * Stateful entry point: owns the [LoginViewModel], observes its state lifecycle-aware, and feeds
+ * field edits back through [LoginViewModel.onAction]. Navigation actions stay hoisted to the caller —
+ * there is no nav graph wired yet, so they default to no-ops. The pixel UI lives in [LoginScreen],
+ * kept stateless so its @Preview works without a ViewModel.
+ */
+@Composable
+fun LoginRoute(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {},
+    onForgotPassword: () -> Unit = {},
+    onSignIn: () -> Unit = {},
+    onGoogle: () -> Unit = {},
+    onApple: () -> Unit = {},
+    onCreateAccount: () -> Unit = {},
+    viewModel: LoginViewModel = viewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Collect one-shot ViewModel → screen notifications exactly once for this composition.
+    LaunchedEffect(Unit) {
+        viewModel.events.collect {
+            // when (it) { } — handle ViewModel → screen notifications here (none yet)
+        }
+    }
+
+    LoginScreen(
+        modifier = modifier,
+        email = state.email,
+        onEmailChange = { viewModel.onAction(LoginUiAction.EmailChanged(it)) },
+        password = state.password,
+        onPasswordChange = { viewModel.onAction(LoginUiAction.PasswordChanged(it)) },
+        onBack = onBack,
+        onForgotPassword = onForgotPassword,
+        onSignIn = onSignIn,
+        onGoogle = onGoogle,
+        onApple = onApple,
+        onCreateAccount = onCreateAccount,
+    )
+}
 
 /**
  * Login — pixel-built from Figma. Sign-in form in the auth flow: top bar, serif headline + subcopy,

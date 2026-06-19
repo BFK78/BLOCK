@@ -139,7 +139,7 @@ Android needed). Run:
 - [ ] Module is one feature; layers are `data`/`domain`/`presentation` **packages**, not modules.
 - [ ] `domain` has no Android / Compose / Room imports.
 - [ ] Repository **interface** in domain; **Impl** in data; bound via Hilt `@Binds`.
-- [ ] UiState is `StateFlow`; effects go through a `Channel`; new state only via the pure reducer.
+- [ ] UiState is `StateFlow`; events go through a `Channel`; new state only via the pure reducer.
 - [ ] No `:features:* -> :features:*` dependency; shared code lives in `:core:*`.
 - [ ] Resources prefixed `features_<name>_`; sources under `src/main/kotlin`.
 - [ ] If Hilt ViewModels are used: app is Hilt-enabled and depends on the feature.

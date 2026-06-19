@@ -1,4 +1,4 @@
-package com.basim.block.features.authentication.signup
+package com.basim.block.features.authentication.presentation.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,8 +35,8 @@ import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
-import com.basim.block.features.authentication.common.components.AuthLinkFooter
-import com.basim.block.features.authentication.common.components.AuthSocialSection
+import com.basim.block.features.authentication.presentation.common.components.AuthLinkFooter
+import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
 
 /**
  * Sign Up — pixel-built from Figma. Account-creation form in the auth flow: top bar, serif headline

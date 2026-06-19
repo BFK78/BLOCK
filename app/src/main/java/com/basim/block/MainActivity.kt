@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
-import com.basim.block.features.authentication.landing.AuthLandingScreen
+import com.basim.block.features.authentication.presentation.landing.AuthLandingScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
