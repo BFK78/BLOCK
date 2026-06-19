@@ -29,10 +29,11 @@ class MainActivity : ComponentActivity() {
                                     .start()
                             }
                             .start()
-                    }, 250
+                    }, 250 // Adding a small delay to gracefully complete the icon animation.
                 )
             }
         }
+
         super.onCreate(savedInstanceState)
         setContent {
             BlockTheme {
