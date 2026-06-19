@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  Block — animated splash glyph
+  Single-file AnimatedVectorDrawable (vector + animators bundled via aapt).
+  Drop into res/drawable/ and reference it directly. No extra files needed.
+
+  Motion:
+    1. Three blocks assemble in a staggered cascade (bottom-left -> bottom-right -> gold).
+       Each drops in (translateY) and pops up (scale 0 -> 1) with a springy overshoot,
+       fading in as it lands. Easing approximates M3 "emphasized" motion.
+    2. The gold accent does a final subtle "lock-in" pulse once everything is in place.
+
+  Geometry note: the 32x32 artwork is centered inside a padded 76x76 viewport
+  (group offset 22,22) so the whole glyph — including overshoot scale and the gold
+  pop — stays within the circular mask that the Android 12+ splash screen applies.
+  The art occupies the central ~2/3, matching the splash icon safe zone.
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+
+    <!-- ============================ THE DRAWABLE ============================ -->
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="288dp"
+            android:height="288dp"
+            android:viewportWidth="76"
+            android:viewportHeight="76">
+
+            <!-- Outer group centers the 32x32 art inside the 76x76 padded viewport (safe zone) -->
+            <group
+                android:name="root"
+                android:translateX="22"
+                android:translateY="22">
+
+                <!-- Block A — bottom-left (champagne) -->
+                <group
+                    android:name="blockA"
+                    android:pivotX="8"
+                    android:pivotY="24"
+                    android:scaleX="0"
+                    android:scaleY="0"
+                    android:translateY="-4">
+                    <path
+                        android:name="pathA"
+                        android:fillAlpha="0"
+                        android:fillColor="#F4F2EC"
+                        android:pathData="M5,17 L11,17 A4,4 0 0 1 15,21 L15,27 A4,4 0 0 1 11,31 L5,31 A4,4 0 0 1 1,27 L1,21 A4,4 0 0 1 5,17 Z" />
+                </group>
+
+                <!-- Block B — bottom-right (champagne) -->
+                <group
+                    android:name="blockB"
+                    android:pivotX="24"
+                    android:pivotY="24"
+                    android:scaleX="0"
+                    android:scaleY="0"
+                    android:translateY="-4">
+                    <path
+                        android:name="pathB"
+                        android:fillAlpha="0"
+                        android:fillColor="#F4F2EC"
+                        android:pathData="M21,17 L27,17 A4,4 0 0 1 31,21 L31,27 A4,4 0 0 1 27,31 L21,31 A4,4 0 0 1 17,27 L17,21 A4,4 0 0 1 21,17 Z" />
+                </group>
+
+                <!-- Block C — top-right accent (gold) -->
+                <group
+                    android:name="blockC"
+                    android:pivotX="24"
+                    android:pivotY="8"
+                    android:scaleX="0"
+                    android:scaleY="0"
+                    android:translateY="-4">
+                    <path
+                        android:name="pathC"
+                        android:fillAlpha="0"
+                        android:fillColor="#D4BC78"
+                        android:pathData="M21,1 L27,1 A4,4 0 0 1 31,5 L31,11 A4,4 0 0 1 27,15 L21,15 A4,4 0 0 1 17,11 L17,5 A4,4 0 0 1 21,1 Z" />
+                </group>
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <!-- ============================ ANIMATIONS ============================ -->
+
+    <!-- Block A : entrance (stagger 0ms) -->
+    <target android:name="blockA">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="scaleX"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType">
+                    <aapt:attr name="android:interpolator">
+                        <pathInterpolator
+                            android:controlX1="0.25"
+                            android:controlX2="0.45"
+                            android:controlY1="1.25"
+                            android:controlY2="1.0" />
+                    </aapt:attr>
+                </objectAnimator>
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="scaleY"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType">
+                    <aapt:attr name="android:interpolator">
+                        <pathInterpolator
+                            android:controlX1="0.25"
+                            android:controlX2="0.45"
+                            android:controlY1="1.25"
+                            android:controlY2="1.0" />
+                    </aapt:attr>
+                </objectAnimator>
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="translateY"
+                    android:startOffset="0"
+                    android:valueFrom="-4"
+                    android:valueTo="0"
+                    android:valueType="floatType">
+                    <aapt:attr name="android:interpolator">
+                        <pathInterpolator
+                            android:controlX1="0.05"
+                            android:controlX2="0.1"
+                            android:controlY1="0.7"
+                            android:controlY2="1.0" />
+                    </aapt:attr>
+                </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="pathA">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="260"
+                android:propertyName="fillAlpha"
+                android:startOffset="40"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType">
+                <aapt:attr name="android:interpolator">
+                    <pathInterpolator
+                        android:controlX1="0.4"
+                        android:controlX2="0.2"
+                        android:controlY1="0.0"
+                        android:controlY2="1.0" />
+                </aapt:attr>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <!-- Block B : entrance (stagger 100ms) -->
+    <target android:name="blockB">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="scaleX"
+                    android:startOffset="100"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType">
+                    <aapt:attr name="android:interpolator">
+                        <pathInterpolator
+                            android:controlX1="0.25"
+                            android:controlX2="0.45"
+                            android:controlY1="1.25"
+                            android:controlY2="1.0" />
+                    </aapt:attr>
+                </objectAnimator>
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="scaleY"
+                    android:startOffset="100"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType">
+                    <aapt:attr name="android:interpolator">
+                        <pathInterpolator
+                            android:controlX1="0.25"
+                            android:controlX2="0.45"
+                            android:controlY1="1.25"
+                            android:controlY2="1.0" />
+                    </aapt:attr>
+                </objectAnimator>
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="translateY"
+                    android:startOffset="100"
+                    android:valueFrom="-4"
+                    android:valueTo="0"
+                    android:valueType="floatType">
+                    <aapt:attr name="android:interpolator">
+                        <pathInterpolator
+                            android:controlX1="0.05"
+                            android:controlX2="0.1"
+                            android:controlY1="0.7"
+                            android:controlY2="1.0" />
+                    </aapt:attr>
+                </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="pathB">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="260"
+                android:propertyName="fillAlpha"
+                android:startOffset="140"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType">
+                <aapt:attr name="android:interpolator">
+                    <pathInterpolator
+                        android:controlX1="0.4"
+                        android:controlX2="0.2"
+                        android:controlY1="0.0"
+                        android:controlY2="1.0" />
+                </aapt:attr>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <!-- Block C : entrance (stagger 200ms) then gold lock-in pop -->
+    <target android:name="blockC">
+        <aapt:attr name="android:animation">
+            <set android:ordering="sequentially">
+
+                <!-- entrance -->
+                <set android:ordering="together">
+                    <objectAnimator
+                        android:duration="500"
+                        android:propertyName="scaleX"
+                        android:startOffset="200"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:valueType="floatType">
+                        <aapt:attr name="android:interpolator">
+                            <pathInterpolator
+                                android:controlX1="0.25"
+                                android:controlX2="0.45"
+                                android:controlY1="1.25"
+                                android:controlY2="1.0" />
+                        </aapt:attr>
+                    </objectAnimator>
+                    <objectAnimator
+                        android:duration="500"
+                        android:propertyName="scaleY"
+                        android:startOffset="200"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:valueType="floatType">
+                        <aapt:attr name="android:interpolator">
+                            <pathInterpolator
+                                android:controlX1="0.25"
+                                android:controlX2="0.45"
+                                android:controlY1="1.25"
+                                android:controlY2="1.0" />
+                        </aapt:attr>
+                    </objectAnimator>
+                    <objectAnimator
+                        android:duration="500"
+                        android:propertyName="translateY"
+                        android:startOffset="200"
+                        android:valueFrom="-4"
+                        android:valueTo="0"
+                        android:valueType="floatType">
+                        <aapt:attr name="android:interpolator">
+                            <pathInterpolator
+                                android:controlX1="0.05"
+                                android:controlX2="0.1"
+                                android:controlY1="0.7"
+                                android:controlY2="1.0" />
+                        </aapt:attr>
+                    </objectAnimator>
+                </set>
+
+                <!-- gold lock-in pop: scale up and settle back (80ms gap, then 1 -> 1.12 -> 1) -->
+                <set android:ordering="together">
+                    <objectAnimator
+                        android:duration="200"
+                        android:propertyName="scaleX"
+                        android:repeatCount="1"
+                        android:repeatMode="reverse"
+                        android:startOffset="80"
+                        android:valueFrom="1"
+                        android:valueTo="1.12"
+                        android:valueType="floatType">
+                        <aapt:attr name="android:interpolator">
+                            <pathInterpolator
+                                android:controlX1="0.4"
+                                android:controlX2="0.2"
+                                android:controlY1="0.0"
+                                android:controlY2="1.0" />
+                        </aapt:attr>
+                    </objectAnimator>
+                    <objectAnimator
+                        android:duration="200"
+                        android:propertyName="scaleY"
+                        android:repeatCount="1"
+                        android:repeatMode="reverse"
+                        android:startOffset="80"
+                        android:valueFrom="1"
+                        android:valueTo="1.12"
+                        android:valueType="floatType">
+                        <aapt:attr name="android:interpolator">
+                            <pathInterpolator
+                                android:controlX1="0.4"
+                                android:controlX2="0.2"
+                                android:controlY1="0.0"
+                                android:controlY2="1.0" />
+                        </aapt:attr>
+                    </objectAnimator>
+                </set>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="pathC">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="260"
+                android:propertyName="fillAlpha"
+                android:startOffset="240"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType">
+                <aapt:attr name="android:interpolator">
+                    <pathInterpolator
+                        android:controlX1="0.4"
+                        android:controlX2="0.2"
+                        android:controlY1="0.0"
+                        android:controlY2="1.0" />
+                </aapt:attr>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+</animated-vector>

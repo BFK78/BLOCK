@@ -33,6 +33,8 @@ android {
         }
     }
     compileOptions {
+        // Required because :core:designkit (convention plugin) enables core library desugaring.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -54,6 +56,9 @@ kotlin {
 
 dependencies {
 
+    implementation(project(":core:designkit"))
+    implementation(libs.androidx.core.splashscreen)
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

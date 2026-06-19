@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Theme.Block" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Launch theme: branded Android 12+ splash (backported to API 23+ via core-splashscreen). -->
+    <style name="Theme.Block.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ink950</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_block_logo_animated</item>
+        <item name="postSplashScreenTheme">@style/Theme.Block</item>
+    </style>
 </resources>

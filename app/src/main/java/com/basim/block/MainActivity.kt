@@ -3,44 +3,41 @@ package com.basim.block
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.basim.block.ui.theme.BlockTheme
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.basim.block.core.designkit.designsystem.theme.BlockTheme
+import com.basim.block.ui.splash.SplashScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Must be installed before super.onCreate() so the system splash hands off cleanly.
+        installSplashScreen().apply {
+            setOnExitAnimationListener { splashView ->
+                splashView.iconView.postDelayed(
+                    {
+                        splashView.iconView.animate()
+                            .scaleX(1.5f)
+                            .scaleY(1.5f)
+                            .alpha(0f)
+                            .setDuration(400)
+                            .withEndAction {
+                                splashView.view.animate()
+                                    .alpha(0f)
+                                    .setDuration(150)
+                                    .withEndAction {
+                                        splashView.remove()
+                                    }
+                                    .start()
+                            }
+                            .start()
+                    }, 250
+                )
+            }
+        }
         super.onCreate(savedInstanceState)
         setContent {
             BlockTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+                SplashScreen()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BlockTheme {
-        Greeting("Android")
     }
 }
