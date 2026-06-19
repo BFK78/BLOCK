@@ -10,6 +10,13 @@
     <string name="features_authentication_registration_title">Create your account</string>
     <!--  End Registration Screen  -->
 
+    <!--  Auth Landing Screen  -->
+    <string name="features_authentication_landing_welcome">Calm confidence\nabout money.</string>
+    <string name="features_authentication_landing_cta_create">Create a profile</string>
+    <string name="features_authentication_landing_have_account">Already have an account?</string>
+    <string name="features_authentication_landing_sign_in">Sign in</string>
+    <!--  End Auth Landing Screen  -->
+
     <!--  Onboarding (shared)  -->
     <string name="features_authentication_onboarding_skip">Skip</string>
     <string name="features_authentication_onboarding_cta_next">Next</string>

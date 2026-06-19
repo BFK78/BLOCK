@@ -40,7 +40,7 @@ fun BlockButton(
         enabled = enabled,
         shape = shape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.onBackground
+            containerColor = MaterialTheme.colorScheme.primary
         ),
         contentPadding = contentPadding,
         content = content

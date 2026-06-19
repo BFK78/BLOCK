@@ -54,6 +54,18 @@ Break any of these and the screen is wrong even if it compiles:
    components are encouraged; experimental APIs are fine (opt in explicitly).
 6. **Leave a Figma backlink** at the top of the screen composable so the next agent can re-open the
    exact frame (format below).
+7. **Don't bloat one file — distribute meaningfully.** "One screen" is a scope of work, not a
+   mandate to cram everything into one `.kt`. When the screen file grows past a comfortable read
+   (rough rule: more than ~200 lines, or once it holds several distinct concerns), split the
+   private helpers into sibling files in the **same screen package** — e.g. `<Screen>Screen.kt`
+   (the screen composable + its `@Preview`), `<Screen>Page.kt` / section composables + their data
+   models, `<Screen>Illustration.kt` for bespoke canvas/illustration drawing. Split by concern, not
+   by line count alone; keep each file cohesive. Symbols shared across the split files become
+   `internal` (still module-scoped); leaf helpers stay `private`. The public screen composable's
+   signature never changes. This is still **one screen** — the split is about readability, not new
+   scope, and these files stay UI-only (no ViewModel/Contract/Reducer/nav/DI). Reusable widgets
+   still go to `:core:designkit` or the feature's `common/components/` per rule 4 — sibling files
+   are for screen-private pieces only.
 
 ## Workflow
 
@@ -95,7 +107,7 @@ Load **`block-architecture`** and follow it for placement. In short:
 Write `<Screen>Screen.kt` as a **stateless composable** plus a `@Preview`. Pattern:
 
 ```kotlin
-package com.basim.block.features.<name>.presentation.<screen>
+package com.basim.block.features.<name > . presentation .<screen>
 
 // ...imports
 
@@ -106,7 +118,7 @@ package com.basim.block.features.<name>.presentation.<screen>
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class) // only if you use an expressive/experimental API
 @Composable
-fun <Screen>Screen(
+fun <Screen> Screen(
     modifier: Modifier = Modifier,
     // stateless hooks for later wiring — plain lambdas/values, NO ViewModel
     onBack: () -> Unit = {},
@@ -119,7 +131,7 @@ fun <Screen>Screen(
         verticalArrangement = Arrangement.spacedBy(dimens.spacing16),
     ) {
         Text(
-            text = stringResource(R.string.features_<name>_<screen>_title),
+            text = stringResource(R.string.features_<name> _ < screen > _title),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -129,10 +141,10 @@ fun <Screen>Screen(
 
 @Preview
 @Composable
-private fun <Screen>ScreenPreview() {
+private fun <Screen> ScreenPreview() {
     BlockTheme {
         BlockBackground {
-            <Screen>Screen()
+            <Screen > Screen()
         }
     }
 }
@@ -177,7 +189,10 @@ with specifics rather than shipping an approximation.
 ## Done checklist
 
 - [ ] Built from the actual Figma frame (backlink comment present, correct mode).
-- [ ] Only `<Screen>Screen.kt` + `@Preview` added — no ViewModel/Contract/Reducer/nav/DI.
+- [ ] Only the screen UI added — no ViewModel/Contract/Reducer/nav/DI. If large, split into cohesive
+  sibling files in the screen package (screen + `@Preview`, sections/data, illustrations) rather
+  than
+  one bloated file.
 - [ ] All strings in `strings.xml`, `features_<name>_`-prefixed, via `stringResource`.
 - [ ] Colors/type/spacing bound to `MaterialTheme` + `LocalDimens`; literals only where no token
   fits
