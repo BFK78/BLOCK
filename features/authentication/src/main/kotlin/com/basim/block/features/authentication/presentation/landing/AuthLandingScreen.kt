@@ -1,17 +1,14 @@
 package com.basim.block.features.authentication.presentation.landing
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.style.styleable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockLogo
+import com.basim.block.core.designkit.designsystem.component.BlockTextLink
+import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
@@ -46,10 +45,8 @@ fun AuthLandingScreen(
     val dimens = LocalDimens.current
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = dimens.spacing24, vertical = dimens.spacing32),
+            .styleable(null, rememberDefaultScreenStyle())
+            .systemBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(dimens.spacing16),
     ) {
@@ -92,11 +89,9 @@ fun AuthLandingScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             // Inline emerald text link (Figma Link component 27:14).
-            Text(
+            BlockTextLink(
                 text = stringResource(R.string.features_authentication_landing_sign_in),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.clickable(onClick = onSignIn),
+                onClick = onSignIn,
             )
         }
     }

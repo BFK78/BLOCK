@@ -1,4 +1,4 @@
-package com.basim.block.core.designkit.designsystem.component
+package com.basim.block.features.authentication.presentation.common.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,16 +16,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 
 /**
- * Slim top bar: a 48dp back icon-button on the leading edge, a centered uppercase eyebrow label, and
- * a 48dp spacer on the trailing edge so the eyebrow stays optically centered. Mirrors the Figma
- * `TopAppBar` component (node 36:54).
+ * Slim top bar shared by the auth screens: a 48dp back icon-button on the leading edge, a centered
+ * uppercase eyebrow label, and a 48dp spacer on the trailing edge so the eyebrow stays optically
+ * centered. Mirrors the Figma `TopAppBar` component (node 36:54).
  */
 @Composable
-fun BlockTopAppBar(
+fun AuthTopAppBar(
     eyebrow: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -63,14 +64,14 @@ fun BlockTopAppBar(
 
 @PreviewLightDark
 @Composable
-private fun BlockTopAppBarPreview() {
+private fun AuthTopAppBarPreview() {
     BlockTheme {
         BlockBackground(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
         ) {
-            BlockTopAppBar(eyebrow = "GET STARTED", onBack = {})
+            AuthTopAppBar(eyebrow = "GET STARTED", onBack = {})
         }
     }
 }

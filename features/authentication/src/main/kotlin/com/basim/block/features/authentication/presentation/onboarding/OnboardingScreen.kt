@@ -1,19 +1,18 @@
 package com.basim.block.features.authentication.presentation.onboarding
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.style.styleable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockPageIndicator
 import com.basim.block.core.designkit.designsystem.component.BlockTextButton
+import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
@@ -59,10 +59,8 @@ fun OnboardingScreen(
 
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = dimens.spacing24, vertical = dimens.spacing32),
+            .styleable(null, rememberDefaultScreenStyle())
+            .systemBarsPadding(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

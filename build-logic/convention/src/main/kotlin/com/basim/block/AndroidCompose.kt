@@ -37,6 +37,8 @@ internal fun Project.configureAndroidCompose(
         // Adding arguments for the kotlin compiler for capturing the metrics and reports, so that we can analyze the performance.
         tasks.withType<KotlinCompile>().configureEach {
             compilerOptions {
+                // Opt in to the experimental Compose Foundation Style API (androidx.compose.foundation.style.*)
+                optIn.add("androidx.compose.foundation.style.ExperimentalFoundationStyleApi")
                 freeCompilerArgs.addAll(buildComposeMetricsParameters())
                 freeCompilerArgs.addAll(stabilityConfiguration())
                 // experimentalStrongSkipping is enabled by default in Kotlin 2.0+ compose compiler

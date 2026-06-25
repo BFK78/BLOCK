@@ -1,16 +1,14 @@
 package com.basim.block.features.authentication.presentation.login
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.style.styleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,14 +28,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockInputField
+import com.basim.block.core.designkit.designsystem.component.BlockLabeledDivider
 import com.basim.block.core.designkit.designsystem.component.BlockPasswordField
 import com.basim.block.core.designkit.designsystem.component.BlockTextLink
-import com.basim.block.core.designkit.designsystem.component.BlockTopAppBar
+import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
 import com.basim.block.features.authentication.presentation.common.components.AuthLinkFooter
 import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
+import com.basim.block.features.authentication.presentation.common.components.AuthTopAppBar
 
 // Figma column gap is 14px between items — no spacing token covers 14, so this is an intentional literal.
 private val LOGIN_ITEM_GAP = 14.dp
@@ -109,13 +109,11 @@ fun LoginScreen(
     val dimens = LocalDimens.current
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = dimens.spacing24, vertical = dimens.spacing32),
+            .styleable(null, rememberDefaultScreenStyle())
+            .statusBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(LOGIN_ITEM_GAP),
     ) {
-        BlockTopAppBar(
+        AuthTopAppBar(
             eyebrow = stringResource(R.string.features_authentication_login_eyebrow),
             onBack = onBack,
         )
@@ -167,6 +165,8 @@ fun LoginScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
         }
+
+        BlockLabeledDivider(label = stringResource(R.string.features_authentication_or))
 
         AuthSocialSection(
             onGoogle = onGoogle,

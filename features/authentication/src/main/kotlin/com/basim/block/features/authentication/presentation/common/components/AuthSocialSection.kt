@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.basim.block.core.designkit.designsystem.component.BlockLabeledDivider
 import com.basim.block.core.designkit.designsystem.component.BlockSocialButton
 import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.features.authentication.R
@@ -33,7 +32,6 @@ fun AuthSocialSection(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(verticalSpacing),
     ) {
-        BlockLabeledDivider(label = stringResource(R.string.features_authentication_or))
         BlockSocialButton(
             label = stringResource(R.string.features_authentication_continue_google),
             onClick = onGoogle,

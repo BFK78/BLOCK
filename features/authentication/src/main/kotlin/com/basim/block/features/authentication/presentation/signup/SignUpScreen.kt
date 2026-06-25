@@ -1,15 +1,14 @@
 package com.basim.block.features.authentication.presentation.signup
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.style.styleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,14 +28,16 @@ import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockCheckbox
 import com.basim.block.core.designkit.designsystem.component.BlockChip
 import com.basim.block.core.designkit.designsystem.component.BlockInputField
+import com.basim.block.core.designkit.designsystem.component.BlockLabeledDivider
 import com.basim.block.core.designkit.designsystem.component.BlockPasswordField
-import com.basim.block.core.designkit.designsystem.component.BlockTopAppBar
 import com.basim.block.core.designkit.designsystem.icon.BlockIcons
+import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
 import com.basim.block.features.authentication.presentation.common.components.AuthLinkFooter
 import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
+import com.basim.block.features.authentication.presentation.common.components.AuthTopAppBar
 
 /**
  * Sign Up — pixel-built from Figma. Account-creation form in the auth flow: top bar, serif headline
@@ -67,13 +68,11 @@ fun SignUpScreen(
     val dimens = LocalDimens.current
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = dimens.spacing24, vertical = dimens.spacing32),
+            .styleable(null, rememberDefaultScreenStyle())
+            .systemBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(dimens.spacing12),
     ) {
-        BlockTopAppBar(
+        AuthTopAppBar(
             eyebrow = stringResource(R.string.features_authentication_signup_eyebrow),
             onBack = onBack,
         )
@@ -137,6 +136,8 @@ fun SignUpScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
         }
+
+        BlockLabeledDivider(label = stringResource(R.string.features_authentication_or))
 
         AuthSocialSection(onGoogle = onGoogle, onApple = onApple)
 
