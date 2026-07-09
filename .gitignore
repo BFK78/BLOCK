@@ -1,17 +1,19 @@
+# Built application files & Gradle
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
+.gradle/
+build/
+/build-logic/convention/build/
 /captures
+
+# Native
 .externalNativeBuild
 .cxx
+
+# Local configuration
 local.properties
-/build-logic/convention/build
-.idea
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
