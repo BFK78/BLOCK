@@ -1,16 +1,14 @@
 package com.basim.block
 
 import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.dsl.ManagedVirtualDevice
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.invoke
 
 // Contravariant => We can use the parent where ever the child is used, achieved using the `in` keyword in generics in kotlin.
 // Covariant => We can use the subtype where ever the type is used, achieved with `out` keyword in generics in kotlin.
 
 // The aestrik here means the star projection in kotlin.
 internal fun configureGradleManagedDevices(
-    commonExtension: CommonExtension<*, *, *, *, *, *>
+    commonExtension: CommonExtension
 ) {
     val pixel4 = DeviceConfig("Pixel 4", 30, "aosp-atd")
     val pixel6 = DeviceConfig("Pixel 6", 31, "aosp")
@@ -21,25 +19,19 @@ internal fun configureGradleManagedDevices(
     //Devices that can be used for CI => Don't know when we will use this but adding just for the sake of it.
     val ciDevices = listOf(pixel4, pixelC)
 
-    commonExtension.testOptions {
-        managedDevices {
-            devices {
-                allDevices.forEach { deviceConfig ->
-                    //maybeCreate => function from gradle, creates the object and add to the container if the object is not in the container.
-                    maybeCreate(deviceConfig.taskName, ManagedVirtualDevice::class.java).apply {
-                        device = deviceConfig.device
-                        apiLevel = deviceConfig.apiLevel
-                        systemImageSource = deviceConfig.systemImageSource
-                    }
-                }
-            }
-            groups {
-                maybeCreate("ci").apply {
-                    ciDevices.forEach { deviceConfig ->
-                        targetDevices.add(devices[deviceConfig.taskName])
-                    }
-                }
-            }
+    val managedDevices = commonExtension.testOptions.managedDevices
+
+    allDevices.forEach { deviceConfig ->
+        //maybeCreate => function from gradle, creates the object and add to the container if the object is not in the container.
+        managedDevices.localDevices.maybeCreate(deviceConfig.taskName).apply {
+            device = deviceConfig.device
+            apiLevel = deviceConfig.apiLevel
+            systemImageSource = deviceConfig.systemImageSource
+        }
+    }
+    managedDevices.groups.maybeCreate("ci").apply {
+        ciDevices.forEach { deviceConfig ->
+            targetDevices.add(managedDevices.localDevices[deviceConfig.taskName])
         }
     }
 }

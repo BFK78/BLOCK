@@ -2,14 +2,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.block.android.hilt)
 }
 
 android {
     namespace = "com.basim.block"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.basim.block"

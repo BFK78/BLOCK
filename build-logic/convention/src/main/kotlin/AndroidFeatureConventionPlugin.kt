@@ -1,4 +1,4 @@
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.basim.block.configureGradleManagedDevices
 import com.basim.block.libs
 import org.gradle.api.Plugin

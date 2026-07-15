@@ -1,5 +1,5 @@
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.basim.block.configureGradleManagedDevices
 import com.basim.block.configureKotlinAndroid
 import com.basim.block.configurePrintApksTask
@@ -19,13 +19,11 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             with(pluginManager) {
                 apply("com.android.library")
-                apply("org.jetbrains.kotlin.android")
                 apply("block.android.lint")
             }
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 36
                 testOptions.animationsDisabled = true
 //				configureFlavours(this) Implement When you need it.
                 configureGradleManagedDevices(this)
@@ -42,7 +40,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("testImplementation", kotlin("test"))
+                // Pin the JUnit4 flavour: AGP 9's built-in Kotlin support no longer auto-detects
+                // the test framework, so a bare kotlin("test") resolves without org.junit on the classpath.
+                add("testImplementation", kotlin("test-junit"))
                 add("implementation", libs.findLibrary("androidx.tracing.ktx").get())
             }
         }

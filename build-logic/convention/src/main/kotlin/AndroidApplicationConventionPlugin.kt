@@ -13,7 +13,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 // TODO Find a way to add this directly from version catalog (libs), eg: libs.plugins.androidApplication or any other way
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
                 apply("block.android.lint")
                 apply("com.dropbox.dependency-guard") // Very useful plugin for dependency management, need to use this in our every project.
             }

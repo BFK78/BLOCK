@@ -7,14 +7,12 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *, *, *>
+    commonExtension: CommonExtension
 ) {
 
     commonExtension.apply {
 
-        buildFeatures {
-            compose = true
-        }
+        buildFeatures.compose = true
 
         // composeOptions.kotlinCompilerExtensionVersion is no longer needed with Kotlin 2.0+
         // The Compose compiler is now bundled with the Kotlin plugin (org.jetbrains.kotlin.plugin.compose)
@@ -27,12 +25,7 @@ internal fun Project.configureAndroidCompose(
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
         }
 
-        testOptions {
-            unitTests {
-                // This is for Robolectric
-                isIncludeAndroidResources = true
-            }
-        }
+        testOptions.unitTests.isIncludeAndroidResources = true // This is for Robolectric
 
         // Adding arguments for the kotlin compiler for capturing the metrics and reports, so that we can analyze the performance.
         tasks.withType<KotlinCompile>().configureEach {
