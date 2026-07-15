@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.block.android.library)
-    alias(libs.plugins.block.android.library.compose)
+    alias(libs.plugins.block.android.hilt)
 }
 
 android {
@@ -8,6 +8,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.navigation3.ui)
-    implementation(libs.androidx.navigation3.runtime)
+    api(libs.androidx.navigation3.runtime)
+    api(libs.androidx.navigation3.ui)
 }
