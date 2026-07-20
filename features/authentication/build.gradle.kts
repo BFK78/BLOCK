@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "com.basim.block.features.authentication"
 }
+
+dependencies {
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+}

@@ -12,6 +12,9 @@ build/
 # Local configuration
 local.properties
 
+# Firebase — per-developer/project config, keep out of VCS
+google-services.json
+
 # IDE
 .idea/
 
