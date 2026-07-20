@@ -18,19 +18,41 @@ class AuthEntryProvider @Inject constructor(): EntryProvider {
         navigator: Navigator
     ) = with(scope) {
         entry<AuthRoute.OnBoarding> {
-            OnboardingScreen {  }
+            OnboardingScreen(
+                onSkip = {
+                    navigator.goTo(AuthRoute.AuthLanding)
+                },
+                onFinish = {
+                    navigator.goTo(AuthRoute.AuthLanding)
+                }
+            )
         }
 
         entry<AuthRoute.AuthLanding> {
-            AuthLandingScreen {  }
+            AuthLandingScreen(
+                onCreateProfile = {
+                    navigator.goTo(AuthRoute.Register)
+                },
+                onSignIn = {
+                    navigator.goTo(AuthRoute.Login)
+                }
+            )
         }
 
         entry<AuthRoute.Login> {
-            LoginScreen {  }
+            LoginScreen(
+                onCreateAccount = {
+                    navigator.goTo(AuthRoute.Register)
+                }
+            )
         }
 
         entry<AuthRoute.Register> {
-            SignUpScreen {  }
+            SignUpScreen(
+                onSignIn = {
+                    navigator.goTo(AuthRoute.Login)
+                }
+            )
         }
     }
 
