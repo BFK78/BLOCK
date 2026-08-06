@@ -6,9 +6,9 @@ import com.basim.block.core.navigation.EntryProvider
 import com.basim.block.core.navigation.EntryProviderType
 import com.basim.block.core.navigation.Navigator
 import com.basim.block.features.authentication.presentation.landing.AuthLandingScreen
-import com.basim.block.features.authentication.presentation.login.LoginScreen
+import com.basim.block.features.authentication.presentation.login.LoginRoute
 import com.basim.block.features.authentication.presentation.onboarding.OnboardingScreen
-import com.basim.block.features.authentication.presentation.signup.SignUpScreen
+import com.basim.block.features.authentication.presentation.signup.SignUpRoute
 import javax.inject.Inject
 
 class AuthEntryProvider @Inject constructor(): EntryProvider {
@@ -40,7 +40,7 @@ class AuthEntryProvider @Inject constructor(): EntryProvider {
         }
 
         entry<AuthRoute.Login> {
-            LoginScreen(
+            LoginRoute(
                 onCreateAccount = {
                     navigator.goTo(AuthRoute.Register)
                 }
@@ -48,7 +48,7 @@ class AuthEntryProvider @Inject constructor(): EntryProvider {
         }
 
         entry<AuthRoute.Register> {
-            SignUpScreen(
+            SignUpRoute(
                 onSignIn = {
                     navigator.goTo(AuthRoute.Login)
                 }

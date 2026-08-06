@@ -14,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockCheckbox
@@ -42,6 +45,56 @@ import com.basim.block.features.authentication.presentation.common.components.Au
 import com.basim.block.features.authentication.presentation.common.components.AuthTopAppBar
 
 /**
+ * Stateful entry point: owns the [SignUpViewModel], observes its state lifecycle-aware, and feeds
+ * user input back through [SignUpViewModel.onAction]. Navigation actions stay hoisted to the caller.
+ * The pixel UI lives in [SignUpScreen], kept stateless so its @Preview works without a ViewModel.
+ */
+@Composable
+fun SignUpRoute(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {},
+    onAddPromo: () -> Unit = {},
+    onGoogle: () -> Unit = {},
+    onApple: () -> Unit = {},
+    onSignIn: () -> Unit = {},
+    onSignUpSucceeded: () -> Unit = {},
+    viewModel: SignUpViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Collect one-shot ViewModel → screen notifications exactly once for this composition.
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                SignUpUiEvent.SignUpSucceeded -> onSignUpSucceeded()
+            }
+        }
+    }
+
+    SignUpScreen(
+        email = state.email,
+        onEmailChange = { viewModel.onAction(SignUpUiAction.EmailChanged(it)) },
+        password = state.password,
+        onPasswordChange = { viewModel.onAction(SignUpUiAction.PasswordChanged(it)) },
+        passwordValidation = state.passwordValidation,
+        passwordStrength = passwordStrengthOf(state.passwordValidation),
+        termsAccepted = state.termsAccepted,
+        onTermsAcceptedChange = { viewModel.onAction(SignUpUiAction.TermsAcceptedChanged(it)) },
+        onBack = onBack,
+        onAddPromo = onAddPromo,
+        onContinue = { viewModel.onAction(SignUpUiAction.SignUpClicked) },
+        onGoogle = onGoogle,
+        onApple = onApple,
+        onSignIn = onSignIn,
+        modifier = modifier,
+    )
+}
+
+/** Meter score: one point per satisfied password rule. */
+private fun passwordStrengthOf(validation: PasswordValidationResult): Int =
+    PasswordValidationError.entries.size - validation.errors.size
+
+/**
  * Sign Up — pixel-built from Figma. Account-creation form in the auth flow: top bar, serif headline
  * + subcopy, email + password (with strength meter) fields, a promo-code chip, a terms checkbox, a
  * primary "Continue" CTA, then the shared social-auth block and a "Sign in" footer. Stateless — the
@@ -52,23 +105,21 @@ import com.basim.block.features.authentication.presentation.common.components.Au
  */
 @Composable
 fun SignUpScreen(
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    passwordValidation: PasswordValidationResult,
+    passwordStrength: Int,
+    termsAccepted: Boolean,
+    onTermsAcceptedChange: (Boolean) -> Unit,
+    onBack: () -> Unit,
+    onAddPromo: () -> Unit,
+    onContinue: () -> Unit,
+    onGoogle: () -> Unit,
+    onApple: () -> Unit,
+    onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
-    email: String = "",
-    onEmailChange: (String) -> Unit = {},
-    password: String = "",
-    passwordValidation: PasswordValidationResult = PasswordValidationResult(errors = setOf(PasswordValidationError.MISSING_DIGIT,
-        PasswordValidationError.MISSING_UPPERCASE, PasswordValidationError.MISSING_LOWER_CASE,
-        PasswordValidationError.TOO_SHORT)),
-    onPasswordChange: (String) -> Unit = {},
-    passwordStrength: Int = 0,
-    termsAccepted: Boolean = false,
-    onTermsAcceptedChange: (Boolean) -> Unit = {},
-    onBack: () -> Unit = {},
-    onAddPromo: () -> Unit = {},
-    onContinue: () -> Unit = {},
-    onGoogle: () -> Unit = {},
-    onApple: () -> Unit = {},
-    onSignIn: () -> Unit = {},
 ) {
 
     val passwordErrorText: String = buildPasswordErrorText(passwordValidation)
@@ -182,10 +233,11 @@ private fun buildPasswordErrorText(passwordValidation: PasswordValidationResult)
     }
 
     val errorText = StringBuilder()
-    when(missingList.size) {
+    when (missingList.size) {
         1 -> {
             errorText.append(missingList.firstOrNull())
         }
+
         else -> {
             val last = missingList.removeAt(missingList.lastIndex)
             errorText.append("${missingList.joinToString(", ")} ${stringResource(R.string.features_authentication_and)} $last")
@@ -208,9 +260,21 @@ private fun SignUpScreenPreview() {
                 onEmailChange = { email = it },
                 password = password,
                 onPasswordChange = { password = it },
+                passwordValidation = PasswordValidationResult(
+                    errors = setOf(
+                        PasswordValidationError.MISSING_DIGIT,
+                        PasswordValidationError.MISSING_UPPERCASE
+                    ),
+                ),
                 passwordStrength = 3,
                 termsAccepted = terms,
                 onTermsAcceptedChange = { terms = it },
+                onBack = {},
+                onAddPromo = {},
+                onContinue = {},
+                onGoogle = {},
+                onApple = {},
+                onSignIn = {},
             )
         }
     }

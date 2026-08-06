@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockInputField
@@ -44,42 +44,43 @@ private val LOGIN_ITEM_GAP = 14.dp
 
 /**
  * Stateful entry point: owns the [LoginViewModel], observes its state lifecycle-aware, and feeds
- * field edits back through [LoginViewModel.onAction]. Navigation actions stay hoisted to the caller —
- * there is no nav graph wired yet, so they default to no-ops. The pixel UI lives in [LoginScreen],
- * kept stateless so its @Preview works without a ViewModel.
+ * field edits back through [LoginViewModel.onAction]. Navigation actions stay hoisted to the caller.
+ * The pixel UI lives in [LoginScreen], kept stateless so its @Preview works without a ViewModel.
  */
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {},
     onForgotPassword: () -> Unit = {},
-    onSignIn: () -> Unit = {},
     onGoogle: () -> Unit = {},
     onApple: () -> Unit = {},
     onCreateAccount: () -> Unit = {},
-    viewModel: LoginViewModel = viewModel(),
+    onSignInSucceeded: () -> Unit = {},
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     // Collect one-shot ViewModel → screen notifications exactly once for this composition.
     LaunchedEffect(Unit) {
-        viewModel.events.collect {
-            // when (it) { } — handle ViewModel → screen notifications here (none yet)
+        viewModel.events.collect { event ->
+            when (event) {
+                LoginUiEvent.SignInSucceeded -> onSignInSucceeded()
+            }
         }
     }
 
     LoginScreen(
-        modifier = modifier,
         email = state.email,
         onEmailChange = { viewModel.onAction(LoginUiAction.EmailChanged(it)) },
         password = state.password,
         onPasswordChange = { viewModel.onAction(LoginUiAction.PasswordChanged(it)) },
         onBack = onBack,
         onForgotPassword = onForgotPassword,
-        onSignIn = onSignIn,
+        onSignIn = { viewModel.onAction(LoginUiAction.SignInClicked) },
         onGoogle = onGoogle,
         onApple = onApple,
         onCreateAccount = onCreateAccount,
+        modifier = modifier,
     )
 }
 
@@ -94,17 +95,17 @@ fun LoginRoute(
  */
 @Composable
 fun LoginScreen(
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    onBack: () -> Unit,
+    onForgotPassword: () -> Unit,
+    onSignIn: () -> Unit,
+    onGoogle: () -> Unit,
+    onApple: () -> Unit,
+    onCreateAccount: () -> Unit,
     modifier: Modifier = Modifier,
-    email: String = "",
-    onEmailChange: (String) -> Unit = {},
-    password: String = "",
-    onPasswordChange: (String) -> Unit = {},
-    onBack: () -> Unit = {},
-    onForgotPassword: () -> Unit = {},
-    onSignIn: () -> Unit = {},
-    onGoogle: () -> Unit = {},
-    onApple: () -> Unit = {},
-    onCreateAccount: () -> Unit = {},
 ) {
     val dimens = LocalDimens.current
     Column(
@@ -196,6 +197,12 @@ private fun LoginScreenPreview() {
                 onEmailChange = { email = it },
                 password = password,
                 onPasswordChange = { password = it },
+                onBack = {},
+                onForgotPassword = {},
+                onSignIn = {},
+                onGoogle = {},
+                onApple = {},
+                onCreateAccount = {},
             )
         }
     }
