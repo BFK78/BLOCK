@@ -2,9 +2,14 @@
 <resources>
     <!--  Shared (auth)  -->
     <string name="features_authentication_or">or</string>
+    <string name="features_authentication_and">and</string>
     <string name="features_authentication_continue_google">Continue with Google</string>
     <string name="features_authentication_continue_apple">Continue with Apple</string>
-    <string name="features_authentication_password_helper">At least 8 characters, one letter, one number or symbol.</string>
+    <string name="features_authentication_password_helper">Password must include %s</string>
+    <string name="features_authentication_password_too_short">at least 8 characters</string>
+    <string name="features_authentication_password_missing_uppercase">one uppercase letter</string>
+    <string name="features_authentication_password_missing_lowercase">one lowercase letter</string>
+    <string name="features_authentication_password_number">one number</string>
 
     <!--  Login Screen  -->
     <string name="features_authentication_login_eyebrow">WELCOME BACK</string>

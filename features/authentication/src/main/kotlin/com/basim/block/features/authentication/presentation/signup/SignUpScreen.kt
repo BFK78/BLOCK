@@ -35,6 +35,8 @@ import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenSt
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.features.authentication.R
+import com.basim.block.features.authentication.domain.validation.PasswordValidationError
+import com.basim.block.features.authentication.domain.validation.PasswordValidationResult
 import com.basim.block.features.authentication.presentation.common.components.AuthLinkFooter
 import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
 import com.basim.block.features.authentication.presentation.common.components.AuthTopAppBar
@@ -54,6 +56,9 @@ fun SignUpScreen(
     email: String = "",
     onEmailChange: (String) -> Unit = {},
     password: String = "",
+    passwordValidation: PasswordValidationResult = PasswordValidationResult(errors = setOf(PasswordValidationError.MISSING_DIGIT,
+        PasswordValidationError.MISSING_UPPERCASE, PasswordValidationError.MISSING_LOWER_CASE,
+        PasswordValidationError.TOO_SHORT)),
     onPasswordChange: (String) -> Unit = {},
     passwordStrength: Int = 0,
     termsAccepted: Boolean = false,
@@ -65,6 +70,10 @@ fun SignUpScreen(
     onApple: () -> Unit = {},
     onSignIn: () -> Unit = {},
 ) {
+
+    val passwordErrorText: String = buildPasswordErrorText(passwordValidation)
+
+
     val dimens = LocalDimens.current
     Column(
         modifier = modifier
@@ -100,7 +109,7 @@ fun SignUpScreen(
             value = password,
             onValueChange = onPasswordChange,
             label = stringResource(R.string.features_authentication_signup_password_label),
-            helper = stringResource(R.string.features_authentication_password_helper),
+            helper = passwordErrorText,
             showStrengthMeter = true,
             strength = passwordStrength,
         )
@@ -148,6 +157,42 @@ fun SignUpScreen(
             modifier = Modifier.padding(top = dimens.spacing4),
         )
     }
+}
+
+@Composable
+private fun buildPasswordErrorText(passwordValidation: PasswordValidationResult): String {
+
+    if (passwordValidation.isValid) return ""
+    val missingList = mutableListOf<String>()
+
+    if (PasswordValidationError.TOO_SHORT in passwordValidation.errors) {
+        missingList.add(stringResource(R.string.features_authentication_password_too_short))
+    }
+
+    if (PasswordValidationError.MISSING_LOWER_CASE in passwordValidation.errors) {
+        missingList.add(stringResource(R.string.features_authentication_password_missing_lowercase))
+    }
+
+    if (PasswordValidationError.MISSING_UPPERCASE in passwordValidation.errors) {
+        missingList.add(stringResource(R.string.features_authentication_password_missing_uppercase))
+    }
+
+    if (PasswordValidationError.MISSING_DIGIT in passwordValidation.errors) {
+        missingList.add(stringResource(R.string.features_authentication_password_number))
+    }
+
+    val errorText = StringBuilder()
+    when(missingList.size) {
+        1 -> {
+            errorText.append(missingList.firstOrNull())
+        }
+        else -> {
+            val last = missingList.removeAt(missingList.lastIndex)
+            errorText.append("${missingList.joinToString(", ")} ${stringResource(R.string.features_authentication_and)} $last")
+        }
+    }
+
+    return stringResource(R.string.features_authentication_password_helper, errorText.toString())
 }
 
 @PreviewLightDark
