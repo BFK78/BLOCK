@@ -29,6 +29,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
                 "api"(project(":core:navigation"))
                 "implementation"(project(":core:designkit"))
+                "implementation"(project(":core:ui"))
 
                 add(
                     "androidTestImplementation",

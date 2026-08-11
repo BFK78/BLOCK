@@ -37,6 +37,8 @@ import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
+import com.basim.block.core.ui.animation.entrance
+import com.basim.block.core.ui.animation.rememberEntranceTrigger
 import com.basim.block.features.authentication.R
 import com.basim.block.features.authentication.domain.validation.PasswordValidationError
 import com.basim.block.features.authentication.domain.validation.PasswordValidationResult
@@ -126,6 +128,8 @@ fun SignUpScreen(
 
 
     val dimens = LocalDimens.current
+    // Flips true after first composition, driving the staggered fade+rise intro below.
+    val visible = rememberEntranceTrigger()
     Column(
         modifier = modifier
             .styleable(null, rememberDefaultScreenStyle())
@@ -135,17 +139,20 @@ fun SignUpScreen(
         AuthTopAppBar(
             eyebrow = stringResource(R.string.features_authentication_signup_eyebrow),
             onBack = onBack,
+            modifier = Modifier.entrance(visible, order = 0),
         )
 
         Text(
             text = stringResource(R.string.features_authentication_signup_title),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.entrance(visible, order = 1),
         )
         Text(
             text = stringResource(R.string.features_authentication_signup_subcopy),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.entrance(visible, order = 1),
         )
 
         BlockInputField(
@@ -154,6 +161,7 @@ fun SignUpScreen(
             label = stringResource(R.string.features_authentication_signup_email_label),
             placeholder = stringResource(R.string.features_authentication_signup_email_placeholder),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.entrance(visible, order = 2),
         )
 
         BlockPasswordField(
@@ -163,6 +171,7 @@ fun SignUpScreen(
             helper = passwordErrorText,
             showStrengthMeter = true,
             strength = passwordStrength,
+            modifier = Modifier.entrance(visible, order = 3),
         )
 
         BlockChip(
@@ -176,18 +185,21 @@ fun SignUpScreen(
                     modifier = Modifier.size(16.dp),
                 )
             },
+            modifier = Modifier.entrance(visible, order = 4),
         )
 
         BlockCheckbox(
             checked = termsAccepted,
             onCheckedChange = onTermsAcceptedChange,
             label = stringResource(R.string.features_authentication_signup_terms),
+            modifier = Modifier.entrance(visible, order = 5),
         )
 
         BlockButton(
             onClick = onContinue,
             shape = CircleShape, // filled pill CTA (Figma Button/Primary, radius-full)
             modifier = Modifier
+                .entrance(visible, order = 6)
                 .fillMaxWidth()
                 .height(dimens.controlHeight),
         ) {
@@ -197,15 +209,24 @@ fun SignUpScreen(
             )
         }
 
-        BlockLabeledDivider(label = stringResource(R.string.features_authentication_or))
+        BlockLabeledDivider(
+            label = stringResource(R.string.features_authentication_or),
+            modifier = Modifier.entrance(visible, order = 7),
+        )
 
-        AuthSocialSection(onGoogle = onGoogle, onApple = onApple)
+        AuthSocialSection(
+            onGoogle = onGoogle,
+            onApple = onApple,
+            modifier = Modifier.entrance(visible, order = 8),
+        )
 
         AuthLinkFooter(
             prompt = stringResource(R.string.features_authentication_signup_footer_prompt),
             linkLabel = stringResource(R.string.features_authentication_signup_footer_link),
             onClick = onSignIn,
-            modifier = Modifier.padding(top = dimens.spacing4),
+            modifier = Modifier
+                .entrance(visible, order = 9)
+                .padding(top = dimens.spacing4),
         )
     }
 }

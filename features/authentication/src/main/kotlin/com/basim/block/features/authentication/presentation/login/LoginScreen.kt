@@ -34,6 +34,8 @@ import com.basim.block.core.designkit.designsystem.component.BlockTextLink
 import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
+import com.basim.block.core.ui.animation.entrance
+import com.basim.block.core.ui.animation.rememberEntranceTrigger
 import com.basim.block.features.authentication.R
 import com.basim.block.features.authentication.presentation.common.components.AuthLinkFooter
 import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
@@ -108,6 +110,8 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
+    // Flips true after first composition, driving the staggered fade+rise intro below.
+    val visible = rememberEntranceTrigger()
     Column(
         modifier = modifier
             .styleable(null, rememberDefaultScreenStyle())
@@ -117,17 +121,20 @@ fun LoginScreen(
         AuthTopAppBar(
             eyebrow = stringResource(R.string.features_authentication_login_eyebrow),
             onBack = onBack,
+            modifier = Modifier.entrance(visible, order = 0),
         )
 
         Text(
             text = stringResource(R.string.features_authentication_login_title),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.entrance(visible, order = 1),
         )
         Text(
             text = stringResource(R.string.features_authentication_login_subcopy),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.entrance(visible, order = 1),
         )
 
         BlockInputField(
@@ -136,16 +143,20 @@ fun LoginScreen(
             label = stringResource(R.string.features_authentication_login_email_label),
             placeholder = stringResource(R.string.features_authentication_login_email_placeholder),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.entrance(visible, order = 2),
         )
 
         BlockPasswordField(
             value = password,
             onValueChange = onPasswordChange,
             label = stringResource(R.string.features_authentication_login_password_label),
+            modifier = Modifier.entrance(visible, order = 3),
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .entrance(visible, order = 4)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
         ) {
             BlockTextLink(
@@ -158,6 +169,7 @@ fun LoginScreen(
             onClick = onSignIn,
             shape = CircleShape, // filled pill CTA (Figma Button/Primary, radius-full)
             modifier = Modifier
+                .entrance(visible, order = 5)
                 .fillMaxWidth()
                 .height(dimens.controlHeight),
         ) {
@@ -167,12 +179,16 @@ fun LoginScreen(
             )
         }
 
-        BlockLabeledDivider(label = stringResource(R.string.features_authentication_or))
+        BlockLabeledDivider(
+            label = stringResource(R.string.features_authentication_or),
+            modifier = Modifier.entrance(visible, order = 6),
+        )
 
         AuthSocialSection(
             onGoogle = onGoogle,
             onApple = onApple,
             verticalSpacing = LOGIN_ITEM_GAP,
+            modifier = Modifier.entrance(visible, order = 7),
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -181,6 +197,7 @@ fun LoginScreen(
             prompt = stringResource(R.string.features_authentication_login_footer_prompt),
             linkLabel = stringResource(R.string.features_authentication_login_footer_link),
             onClick = onCreateAccount,
+            modifier = Modifier.entrance(visible, order = 8),
         )
     }
 }
