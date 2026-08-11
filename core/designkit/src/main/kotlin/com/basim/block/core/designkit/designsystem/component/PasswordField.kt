@@ -1,6 +1,7 @@
 package com.basim.block.core.designkit.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,16 +34,8 @@ import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 
-/** Number of segments in the password strength meter. */
 private const val STRENGTH_SEGMENTS = 4
 
-/**
- * Password field: the shared [BlockFieldFrame] shell with a trailing show/hide eye toggle, plus an
- * optional 4-segment strength meter and helper line below. Visibility is managed internally; the
- * value itself is hoisted. Mirrors the Figma `Input/Password` component (node 31:96).
- *
- * @param strength number of filled strength segments (0..4); only shown when [showStrengthMeter].
- */
 @Composable
 fun BlockPasswordField(
     value: String,
@@ -52,11 +46,20 @@ fun BlockPasswordField(
     showStrengthMeter: Boolean = false,
     strength: Int = 0,
     enabled: Boolean = true,
+    isError: Boolean = false,
     placeholder: String? = null,
     toggleContentDescription: String? = null,
 ) {
     val dimens = LocalDimens.current
     var visible by remember { mutableStateOf(false) }
+    // Hoisted so the decoration box observes the same focus/press stream as the field itself.
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val visualTransformation = if (visible) {
+        VisualTransformation.None
+    } else {
+        PasswordVisualTransformation()
+    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -65,26 +68,33 @@ fun BlockPasswordField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(BlockFieldHeight),
             enabled = enabled,
             singleLine = true,
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.onSurface,
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = if (visible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
+            visualTransformation = visualTransformation,
+            interactionSource = interactionSource,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
             decorationBox = { innerTextField ->
-                BlockFieldFrame(
-                    label = label,
-                    trailing = {
+                TextFieldDefaults.DecorationBox(
+                    value = value,
+                    innerTextField = innerTextField,
+                    enabled = enabled,
+                    singleLine = true,
+                    visualTransformation = visualTransformation,
+                    interactionSource = interactionSource,
+                    isError = isError,
+                    label = { Text(text = label) },
+                    placeholder = placeholder?.let { { Text(text = it) } },
+                    trailingIcon = {
                         IconButton(
                             onClick = { visible = !visible },
-                            modifier = Modifier.size(44.dp)
+                            modifier = Modifier.size(44.dp),
                         ) {
                             Icon(
                                 imageVector = if (visible) BlockIcons.EyeOff else BlockIcons.Eye,
@@ -94,18 +104,10 @@ fun BlockPasswordField(
                             )
                         }
                     },
-                ) {
-                    Box {
-                        if (value.isEmpty() && placeholder != null) {
-                            Text(
-                                text = placeholder,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
+                    colors = blockFieldColors(),
+                    contentPadding = blockFieldContentPadding(hasTrailing = true),
+                    container = { BlockFieldContainer() },
+                )
             },
         )
 
