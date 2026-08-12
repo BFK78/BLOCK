@@ -1,5 +1,6 @@
 package com.basim.block.core.designkit.designsystem.component
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -62,7 +63,9 @@ fun BlockPasswordField(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(dimens.spacing8),
     ) {
         BasicTextField(
@@ -136,7 +139,7 @@ fun BlockPasswordField(
             }
         }
 
-        if (helper != null) {
+        if (!helper.isNullOrEmpty()) {
             Text(
                 text = helper,
                 style = MaterialTheme.typography.bodySmall,
