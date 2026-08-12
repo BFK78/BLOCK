@@ -30,11 +30,15 @@ class SignUpViewModel @Inject constructor(
 
     fun onAction(action: SignUpUiAction) {
         when (action) {
-            is SignUpUiAction.EmailChanged -> apply(SignUpChange.EmailUpdated(action.value))
+            is SignUpUiAction.EmailChanged -> onEmailChange(action.value)
             is SignUpUiAction.PasswordChanged -> onPasswordChange(action.value)
             is SignUpUiAction.TermsAcceptedChanged -> apply(SignUpChange.TermsAcceptedUpdated(action.value))
             SignUpUiAction.SignUpClicked -> signUp()
         }
+    }
+
+    private fun onEmailChange(email: String) {
+        apply(SignUpChange.EmailUpdated(value = email, isValid = isEmailValid(email)))
     }
 
     private fun onPasswordChange(password: String) {
@@ -47,7 +51,7 @@ class SignUpViewModel @Inject constructor(
         val current = _state.value
         if (current.isLoading) return
 
-        val emailInvalid = Patterns.EMAIL_ADDRESS.matcher(current.email).matches().not()
+        val emailInvalid = isEmailValid(current.email).not()
         if (emailInvalid) {
             apply(SignUpChange.InvalidEmail)
         }
@@ -71,6 +75,9 @@ class SignUpViewModel @Inject constructor(
             }
         }
     }
+
+    private fun isEmailValid(email: String): Boolean =
+        Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
     private fun apply(change: SignUpChange) =
         _state.update { SignUpReducer.reduce(it, change) }

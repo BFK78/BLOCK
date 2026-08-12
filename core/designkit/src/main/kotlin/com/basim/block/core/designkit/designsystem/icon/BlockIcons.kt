@@ -2,6 +2,7 @@ package com.basim.block.core.designkit.designsystem.icon
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -20,5 +21,6 @@ object BlockIcons {
     val Plus: ImageVector
         @Composable get() = ImageVector.vectorResource(id = R.drawable.core_designkit_ic_plus)
     val ArrowBack = Icons.AutoMirrored.Rounded.ArrowBack
+    val Error = Icons.Rounded.ErrorOutline
 
 }

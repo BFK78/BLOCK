@@ -5,6 +5,7 @@
     <string name="features_authentication_and">and</string>
     <string name="features_authentication_continue_google">Continue with Google</string>
     <string name="features_authentication_continue_apple">Continue with Apple</string>
+    <string name="features_authentication_email_invalid">Enter a valid email address</string>
     <string name="features_authentication_password_helper">Password must include %s</string>
     <string name="features_authentication_password_too_short">at least 8 characters</string>
     <string name="features_authentication_password_missing_uppercase">one uppercase letter</string>

@@ -82,7 +82,13 @@ fun BlockPasswordField(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             visualTransformation = visualTransformation,
             interactionSource = interactionSource,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+            cursorBrush = SolidColor(
+                if (isError) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.secondary
+                },
+            ),
             decorationBox = { innerTextField ->
                 TextFieldDefaults.DecorationBox(
                     value = value,
@@ -109,7 +115,7 @@ fun BlockPasswordField(
                     },
                     colors = blockFieldColors(),
                     contentPadding = blockFieldContentPadding(hasTrailing = true),
-                    container = { BlockFieldContainer() },
+                    container = { BlockFieldContainer(isError = isError) },
                 )
             },
         )
@@ -140,12 +146,7 @@ fun BlockPasswordField(
         }
 
         if (!helper.isNullOrEmpty()) {
-            Text(
-                text = helper,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = dimens.spacing4),
-            )
+            BlockFieldSupportingText(text = helper, isError = isError)
         }
     }
 }
@@ -167,6 +168,30 @@ private fun BlockPasswordFieldPreview() {
                     helper = "At least 8 characters, one letter, one number or symbol.",
                     showStrengthMeter = true,
                     strength = 4,
+                )
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun BlockPasswordFieldErrorPreview() {
+    BlockTheme {
+        BlockBackground(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
+            Box(modifier = Modifier.padding(16.dp)) {
+                BlockPasswordField(
+                    value = "secret",
+                    onValueChange = {},
+                    label = "Password",
+                    helper = "Password must include at least 8 characters and one number.",
+                    showStrengthMeter = true,
+                    strength = 2,
+                    isError = true,
                 )
             }
         }

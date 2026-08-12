@@ -4,7 +4,7 @@ import com.basim.block.core.common.error.AppError
 import com.basim.block.features.authentication.domain.validation.PasswordValidationResult
 
 sealed interface SignUpChange {
-    data class EmailUpdated(val value: String) : SignUpChange
+    data class EmailUpdated(val value: String, val isValid: Boolean) : SignUpChange
     data class PasswordUpdated(
         val value: String,
         val error: PasswordValidationResult
@@ -20,10 +20,15 @@ sealed interface SignUpChange {
 
 object SignUpReducer {
     fun reduce(state: SignUpUiState, change: SignUpChange): SignUpUiState = when (change) {
-        is SignUpChange.EmailUpdated -> state.copy(email = change.value)
+        is SignUpChange.EmailUpdated -> state.copy(
+            email = change.value,
+            emailInvalidCount = if (change.isValid) 0 else state.emailInvalidCount,
+        )
+
         is SignUpChange.PasswordUpdated -> state.copy(
             password = change.value,
-            passwordValidation = change.error
+            passwordValidation = change.error,
+            passwordInvalidCount = if (change.error.isValid) 0 else state.passwordInvalidCount,
         )
 
         is SignUpChange.TermsAcceptedUpdated -> state.copy(termsAccepted = change.value)

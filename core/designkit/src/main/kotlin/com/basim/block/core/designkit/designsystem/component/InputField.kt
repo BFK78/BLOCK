@@ -1,9 +1,14 @@
 package com.basim.block.core.designkit.designsystem.component
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,11 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,10 +31,13 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 
 internal val BlockFieldHeight = 60.dp
+private val BlockFieldBorderWidth = 1.dp
+private val BlockFieldErrorBorderWidth = 2.dp
 
 /**
  * A text field is composed of three main parts:
@@ -56,61 +66,109 @@ fun BlockInputField(
     placeholder: String? = null,
     enabled: Boolean = true,
     isError: Boolean = false,
+    supportingText: String? = null,
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailing: (@Composable () -> Unit)? = null,
 ) {
+    val dimens = LocalDimens.current
     // Hoisted so the decoration box observes the same focus/press stream as the field itself.
     val interactionSource = remember { MutableInteractionSource() }
 
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier
+    val trailingIcon = trailing ?: if (isError) {
+        { Icon(imageVector = BlockIcons.Error, contentDescription = null) }
+    } else {
+        null
+    }
+
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
-            .height(BlockFieldHeight),
-        enabled = enabled,
-        singleLine = singleLine,
-        textStyle = MaterialTheme.typography.bodyLarge.copy(
-            color = MaterialTheme.colorScheme.onSurface,
-        ),
-        keyboardOptions = keyboardOptions,
-        visualTransformation = visualTransformation,
-        interactionSource = interactionSource,
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
-        decorationBox = { innerTextField ->
-            TextFieldDefaults.DecorationBox(
-                value = value,
-                innerTextField = innerTextField,
-                enabled = enabled,
-                singleLine = singleLine,
-                visualTransformation = visualTransformation,
-                interactionSource = interactionSource,
-                isError = isError,
-                label = { Text(text = label) },
-                placeholder = placeholder?.let { { Text(text = it) } },
-                trailingIcon = trailing,
-                colors = blockFieldColors(),
-                contentPadding = blockFieldContentPadding(hasTrailing = trailing != null),
-                container = { BlockFieldContainer() },
-            )
-        },
+            .animateContentSize(),
+        verticalArrangement = Arrangement.spacedBy(dimens.spacing8),
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier
+                .fillMaxWidth()
+                .height(BlockFieldHeight),
+            enabled = enabled,
+            singleLine = singleLine,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+            ),
+            keyboardOptions = keyboardOptions,
+            visualTransformation = visualTransformation,
+            interactionSource = interactionSource,
+            cursorBrush = SolidColor(
+                if (isError) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.secondary
+                },
+            ),
+            decorationBox = { innerTextField ->
+                TextFieldDefaults.DecorationBox(
+                    value = value,
+                    innerTextField = innerTextField,
+                    enabled = enabled,
+                    singleLine = singleLine,
+                    visualTransformation = visualTransformation,
+                    interactionSource = interactionSource,
+                    isError = isError,
+                    label = { Text(text = label) },
+                    placeholder = placeholder?.let { { Text(text = it) } },
+                    trailingIcon = trailingIcon,
+                    colors = blockFieldColors(),
+                    contentPadding = blockFieldContentPadding(hasTrailing = trailingIcon != null),
+                    container = { BlockFieldContainer(isError = isError) },
+                )
+            },
+        )
+
+        if (!supportingText.isNullOrEmpty()) {
+            BlockFieldSupportingText(text = supportingText, isError = isError)
+        }
+    }
+}
+
+@Composable
+internal fun BlockFieldContainer(isError: Boolean) {
+    val dimens = LocalDimens.current
+    val shape = RoundedCornerShape(dimens.radiusMd)
+
+    val borderColor by animateColorAsState(
+        targetValue = if (isError) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.outlineVariant
+        }
+    )
+    val borderWidth by animateDpAsState(
+        targetValue = if (isError) BlockFieldErrorBorderWidth else BlockFieldBorderWidth,
+    )
+    Box(
+        modifier = Modifier
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surface)
+            .border(width = borderWidth, color = borderColor, shape = shape),
     )
 }
 
 @Composable
-internal fun BlockFieldContainer() {
+internal fun BlockFieldSupportingText(text: String, isError: Boolean) {
     val dimens = LocalDimens.current
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(dimens.radiusMd))
-            .background(MaterialTheme.colorScheme.surface)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant,
-                shape = RoundedCornerShape(dimens.radiusMd),
-            ),
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = if (isError) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        modifier = Modifier.padding(start = dimens.spacing4),
     )
 }
 
@@ -161,6 +219,29 @@ private fun BlockInputFieldPreview() {
                     value = "you@example.com",
                     onValueChange = {},
                     label = "Email",
+                )
+            }
+        }
+    }
+}
+
+/** Error: error-coloured outline at 2.dp, error label, trailing error icon, reason underneath. */
+@PreviewLightDark
+@Composable
+private fun BlockInputFieldErrorPreview() {
+    BlockTheme {
+        BlockBackground(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+        ) {
+            Box(modifier = Modifier.padding(16.dp)) {
+                BlockInputField(
+                    value = "you@example",
+                    onValueChange = {},
+                    label = "Email",
+                    isError = true,
+                    supportingText = "Enter a valid email address",
                 )
             }
         }

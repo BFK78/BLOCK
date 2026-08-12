@@ -48,3 +48,7 @@ fun Modifier.shake(
         translationX = sin(elapsed * SHAKE_CYCLES * 2f * PI.toFloat()) * distancePx * (1f - elapsed)
     }
 }
+
+// Sine of any angle will always give a value between -1 and 1 and that is exactly what we want here
+// 2 PI is one complete wave, if SHAKE_CYCLE is 3 then it will vibrate 3 times.
+// distancePx is how much distance it need to travel and 1f - elapsed will achieve damped oscillation.

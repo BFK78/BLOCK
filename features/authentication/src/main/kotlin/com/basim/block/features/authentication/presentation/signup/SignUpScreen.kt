@@ -5,12 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.style.styleable
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,17 +25,14 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.basim.block.core.designkit.designsystem.component.BlockBackground
 import com.basim.block.core.designkit.designsystem.component.BlockButton
 import com.basim.block.core.designkit.designsystem.component.BlockCheckbox
-import com.basim.block.core.designkit.designsystem.component.BlockChip
 import com.basim.block.core.designkit.designsystem.component.BlockInputField
 import com.basim.block.core.designkit.designsystem.component.BlockLabeledDivider
 import com.basim.block.core.designkit.designsystem.component.BlockPasswordField
-import com.basim.block.core.designkit.designsystem.icon.BlockIcons
 import com.basim.block.core.designkit.designsystem.style.rememberDefaultScreenStyle
 import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
@@ -168,6 +163,8 @@ fun SignUpScreen(
                 .shake(emailInvalidCount)
                 .focusRequester(emailFocusRequester),
             isError = emailInvalidCount > 0,
+            supportingText = stringResource(R.string.features_authentication_email_invalid)
+                .takeIf { emailInvalidCount > 0 },
         )
 
         BlockPasswordField(
@@ -181,20 +178,6 @@ fun SignUpScreen(
                 .entrance(visible, order = 3)
                 .shake(passwordInvalidCount),
             isError = passwordInvalidCount > 0,
-        )
-
-        BlockChip(
-            label = stringResource(R.string.features_authentication_signup_promo),
-            onClick = onAddPromo,
-            leadingIcon = {
-                Icon(
-                    imageVector = BlockIcons.Plus,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp),
-                )
-            },
-            modifier = Modifier.entrance(visible, order = 4),
         )
 
         BlockCheckbox(
