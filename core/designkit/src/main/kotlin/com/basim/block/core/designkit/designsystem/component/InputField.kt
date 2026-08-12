@@ -83,7 +83,7 @@ fun BlockInputField(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(dimens.spacing8),
@@ -91,7 +91,7 @@ fun BlockInputField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(BlockFieldHeight),
             enabled = enabled,
