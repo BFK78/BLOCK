@@ -23,17 +23,6 @@ const val ENTRANCE_DURATION_MILLIS = 320
 const val ENTRANCE_STEP_MILLIS = 50
 
 /**
- * Total time a staggered intro takes, from first element starting to last one settling.
- *
- * Use it to hold back anything that would fight the intro — requesting focus (and with it the
- * IME, which resizes the layout mid-animation and reads as jank), auto-playing media, etc.
- *
- * @param units how many staggered groups the screen has, i.e. the highest [entrance] order + 1.
- */
-fun entranceTotalDurationMillis(units: Int): Long =
-    ENTRANCE_DURATION_MILLIS + units * ENTRANCE_STEP_MILLIS.toLong()
-
-/**
  * Flips false -> true once, after the first composition.
  * That flip is what gives [entrance] something to animate towards.
  *
@@ -71,8 +60,7 @@ fun rememberReducedMotion(): Boolean {
  * @param order stagger position; each step delays the start by [ENTRANCE_STEP_MILLIS].
  * @param rise how far the element travels up as it fades in.
  * @param onSettled fired once, when this element finishes settling into place. Put it on the
- *   highest-[order] element to learn when the whole staggered intro is done — an event-driven
- *   alternative to timing it with [entranceTotalDurationMillis]. Under reduced motion the snap
+ *   highest-[order] element to learn when the whole staggered intro is done. Under reduced motion the snap
  *   still fires it (immediately); it does not fire when there's nothing to animate (e.g. the
  *   element is restored already-visible after a config change).
  */
