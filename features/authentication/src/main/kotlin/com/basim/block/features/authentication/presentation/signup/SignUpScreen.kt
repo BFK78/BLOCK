@@ -22,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -41,6 +43,7 @@ import com.basim.block.core.designkit.designsystem.theme.BlockTheme
 import com.basim.block.core.designkit.designsystem.theme.LocalDimens
 import com.basim.block.core.ui.animation.entrance
 import com.basim.block.core.ui.animation.rememberEntranceTrigger
+import com.basim.block.core.ui.animation.shake
 import com.basim.block.features.authentication.R
 import com.basim.block.features.authentication.domain.validation.PasswordValidationError
 import com.basim.block.features.authentication.domain.validation.PasswordValidationResult
@@ -48,11 +51,6 @@ import com.basim.block.features.authentication.presentation.common.components.Au
 import com.basim.block.features.authentication.presentation.common.components.AuthSocialSection
 import com.basim.block.features.authentication.presentation.common.components.AuthTopAppBar
 
-/**
- * Stateful entry point: owns the [SignUpViewModel], observes its state lifecycle-aware, and feeds
- * user input back through [SignUpViewModel.onAction]. Navigation actions stay hoisted to the caller.
- * The pixel UI lives in [SignUpScreen], kept stateless so its @Preview works without a ViewModel.
- */
 @Composable
 fun SignUpRoute(
     modifier: Modifier = Modifier,
@@ -77,8 +75,10 @@ fun SignUpRoute(
 
     SignUpScreen(
         email = state.email,
+        emailInvalidCount = state.emailInvalidCount,
         onEmailChange = { viewModel.onAction(SignUpUiAction.EmailChanged(it)) },
         password = state.password,
+        passwordInvalidCount = state.passwordInvalidCount,
         onPasswordChange = { viewModel.onAction(SignUpUiAction.PasswordChanged(it)) },
         passwordValidation = state.passwordValidation,
         passwordStrength = passwordStrengthOf(state.passwordValidation),
@@ -94,24 +94,13 @@ fun SignUpRoute(
     )
 }
 
-/** Meter score: one point per satisfied password rule. */
-private fun passwordStrengthOf(validation: PasswordValidationResult): Int =
-    PasswordValidationError.entries.size - validation.errors.size
-
-/**
- * Sign Up — pixel-built from Figma. Account-creation form in the auth flow: top bar, serif headline
- * + subcopy, email + password (with strength meter) fields, a promo-code chip, a terms checkbox, a
- * primary "Continue" CTA, then the shared social-auth block and a "Sign in" footer. Stateless — the
- * field values and terms toggle are hoisted for later ViewModel wiring.
- *
- * Figma: https://www.figma.com/design/R1bw3ysZmoZ83l0VCfUTCt/?node-id=43-42
- * Page: Auth Flows (2:3)  ·  Mode: Dark (canonical) — binds to M3 roles, so it also serves Light.
- */
 @Composable
 fun SignUpScreen(
     email: String,
+    emailInvalidCount: Int,
     onEmailChange: (String) -> Unit,
     password: String,
+    passwordInvalidCount: Int,
     onPasswordChange: (String) -> Unit,
     passwordValidation: PasswordValidationResult,
     passwordStrength: Int,
@@ -126,19 +115,23 @@ fun SignUpScreen(
     modifier: Modifier = Modifier,
 ) {
 
-    val passwordErrorText: String = buildPasswordErrorText(passwordValidation)
-
-
     val dimens = LocalDimens.current
-    // Flips true after first composition, driving the staggered fade+rise intro below.
+    val haptic = LocalHapticFeedback.current
+
     val visible = rememberEntranceTrigger()
-    // Autofocus the email field, but only once the intro has fully settled — requesting focus
-    // earlier would raise the IME mid-animation and resize the layout (reads as jank).
     val emailFocusRequester = remember { FocusRequester() }
     var introSettled by remember { mutableStateOf(false) }
+
     LaunchedEffect(introSettled) {
         if (introSettled) emailFocusRequester.requestFocus()
     }
+
+    LaunchedEffect(passwordInvalidCount, emailInvalidCount) {
+        if (emailInvalidCount > 0 || passwordInvalidCount > 0) {
+            haptic.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
+        }
+    }
+
     Column(
         modifier = modifier
             .styleable(null, rememberDefaultScreenStyle())
@@ -172,17 +165,22 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier
                 .entrance(visible, order = 2)
+                .shake(emailInvalidCount)
                 .focusRequester(emailFocusRequester),
+            isError = emailInvalidCount > 0,
         )
 
         BlockPasswordField(
             value = password,
             onValueChange = onPasswordChange,
             label = stringResource(R.string.features_authentication_signup_password_label),
-            helper = passwordErrorText,
+            helper = buildPasswordErrorText(passwordValidation),
             showStrengthMeter = true,
             strength = passwordStrength,
-            modifier = Modifier.entrance(visible, order = 3),
+            modifier = Modifier
+                .entrance(visible, order = 3)
+                .shake(passwordInvalidCount),
+            isError = passwordInvalidCount > 0,
         )
 
         BlockChip(
@@ -280,6 +278,9 @@ private fun buildPasswordErrorText(passwordValidation: PasswordValidationResult)
     return stringResource(R.string.features_authentication_password_helper, errorText.toString())
 }
 
+private fun passwordStrengthOf(validation: PasswordValidationResult): Int =
+    PasswordValidationError.entries.size - validation.errors.size
+
 @PreviewLightDark
 @Composable
 private fun SignUpScreenPreview() {
@@ -308,6 +309,8 @@ private fun SignUpScreenPreview() {
                 onGoogle = {},
                 onApple = {},
                 onSignIn = {},
+                passwordInvalidCount = 0,
+                emailInvalidCount = 0,
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.basim.block.features.authentication.presentation.signup
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.basim.block.core.common.result.DataResult
@@ -24,8 +25,6 @@ class SignUpViewModel @Inject constructor(
     private val _state = MutableStateFlow(SignUpUiState())
     val state: StateFlow<SignUpUiState> = _state.asStateFlow()
 
-    // One-shot ViewModel → screen notifications. BUFFERED so an event emitted before the
-    // screen collects isn't dropped.
     private val _events = Channel<SignUpUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
@@ -44,8 +43,22 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun signUp() {
+
         val current = _state.value
         if (current.isLoading) return
+
+        val emailInvalid = Patterns.EMAIL_ADDRESS.matcher(current.email).matches().not()
+        if (emailInvalid) {
+            apply(SignUpChange.InvalidEmail)
+        }
+
+        val passwordInvalid = passwordValidator(current.password).isValid.not()
+        if (passwordInvalid) {
+            apply(SignUpChange.InvalidPassword)
+        }
+
+        if (emailInvalid || passwordInvalid) return
+
         apply(SignUpChange.Submitting)
         viewModelScope.launch {
             when (val result = signUpUseCase(current.email, current.password)) {
@@ -59,7 +72,6 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    /** Single funnel for state changes — always through the pure reducer. */
     private fun apply(change: SignUpChange) =
         _state.update { SignUpReducer.reduce(it, change) }
 }

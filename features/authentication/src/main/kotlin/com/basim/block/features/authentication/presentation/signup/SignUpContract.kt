@@ -1,12 +1,12 @@
 package com.basim.block.features.authentication.presentation.signup
 
-import com.basim.block.features.authentication.domain.validation.PasswordValidationError
 import com.basim.block.features.authentication.domain.validation.PasswordValidationResult
 
-/** Everything the Sign-Up screen renders. Immutable single source of truth. */
 data class SignUpUiState(
     val email: String = "",
+    val emailInvalidCount: Int = 0,
     val password: String = "",
+    val passwordInvalidCount: Int = 0,
     val termsAccepted: Boolean = false,
     val isLoading: Boolean = false,
     val passwordValidation: PasswordValidationResult = PasswordValidationResult(emptySet()),
