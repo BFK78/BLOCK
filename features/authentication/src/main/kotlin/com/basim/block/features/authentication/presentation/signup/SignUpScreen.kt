@@ -20,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -130,6 +132,13 @@ fun SignUpScreen(
     val dimens = LocalDimens.current
     // Flips true after first composition, driving the staggered fade+rise intro below.
     val visible = rememberEntranceTrigger()
+    // Autofocus the email field, but only once the intro has fully settled — requesting focus
+    // earlier would raise the IME mid-animation and resize the layout (reads as jank).
+    val emailFocusRequester = remember { FocusRequester() }
+    var introSettled by remember { mutableStateOf(false) }
+    LaunchedEffect(introSettled) {
+        if (introSettled) emailFocusRequester.requestFocus()
+    }
     Column(
         modifier = modifier
             .styleable(null, rememberDefaultScreenStyle())
@@ -161,7 +170,9 @@ fun SignUpScreen(
             label = stringResource(R.string.features_authentication_signup_email_label),
             placeholder = stringResource(R.string.features_authentication_signup_email_placeholder),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.entrance(visible, order = 2),
+            modifier = Modifier
+                .entrance(visible, order = 2)
+                .focusRequester(emailFocusRequester),
         )
 
         BlockPasswordField(
@@ -224,8 +235,9 @@ fun SignUpScreen(
             prompt = stringResource(R.string.features_authentication_signup_footer_prompt),
             linkLabel = stringResource(R.string.features_authentication_signup_footer_link),
             onClick = onSignIn,
+            // Last element in the cascade — its settle marks the whole intro as done.
             modifier = Modifier
-                .entrance(visible, order = 9)
+                .entrance(visible, order = 9, onSettled = { introSettled = true })
                 .padding(top = dimens.spacing4),
         )
     }

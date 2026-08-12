@@ -70,12 +70,18 @@ fun rememberReducedMotion(): Boolean {
  * @param visible drive this from [rememberEntranceTrigger].
  * @param order stagger position; each step delays the start by [ENTRANCE_STEP_MILLIS].
  * @param rise how far the element travels up as it fades in.
+ * @param onSettled fired once, when this element finishes settling into place. Put it on the
+ *   highest-[order] element to learn when the whole staggered intro is done — an event-driven
+ *   alternative to timing it with [entranceTotalDurationMillis]. Under reduced motion the snap
+ *   still fires it (immediately); it does not fire when there's nothing to animate (e.g. the
+ *   element is restored already-visible after a config change).
  */
 @Composable
 fun Modifier.entrance(
     visible: Boolean,
     order: Int = 0,
     rise: Dp = 16.dp,
+    onSettled: (() -> Unit)? = null,
 ): Modifier {
     val reduced = rememberReducedMotion()
     // Note: no `by` delegate — we keep the State object and read it inside the
@@ -92,6 +98,7 @@ fun Modifier.entrance(
             )
         },
         label = "entrance-$order",
+        finishedListener = { end -> if (end == 1f) onSettled?.invoke() },
     )
     val risePx = with(LocalDensity.current) { rise.toPx() }
 
